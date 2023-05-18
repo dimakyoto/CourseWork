@@ -43,7 +43,6 @@ colors = {
 
 # Змінні константи для мейн-циклу
 RUNNING = True
-FREEZETIME = 0.1
 SEARCH = False
 DRAW = False
 ERASE = False
@@ -51,5 +50,4 @@ RESET = False
 ALGO = None
 PRESS = False
 board = Board(v_cells, h_cells, board_start[0], board_start[1], cell_size, screen, colors)
-
 

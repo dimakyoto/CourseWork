@@ -135,3 +135,12 @@ class Board:
     def clear_visited(self):
         self.visited = set()
         self.path = list()
+
+    def get_board_state(self) -> dict:
+        # Повертає словник з результатами пошуку
+        state = {
+            "start": self.start,
+            "target": self.target,
+            "path": self.path,
+        }
+        return state

@@ -1,10 +1,11 @@
 import sys
-from Maze import *
 from Constants import *
 from Algorithms import *
 from ShowElements import *
-
+FREEZETIME = 0.1
 pygame.init()
+
+result_file = open("search_results.txt", "w")
 
 #  Кнопки
 start_button = RectButton(
@@ -55,7 +56,6 @@ astar_evk_button = RectButton(
     text="A* (evk)", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
-
 #  Мейн-цикл
 while RUNNING:
     # Вихід з проги
@@ -91,6 +91,8 @@ while RUNNING:
             reset_button()
             RESET = False
 
+            # Write the results to the file
+            result_file.write("RESET pressed\n\n")
 
         # Натискання на мишу
         left, _, right = pygame.mouse.get_pressed()
@@ -173,7 +175,7 @@ while RUNNING:
                     continue
 
                 elif board.target:
-                    print(" Please do not set FINISH(target), you need just to select start target and than you can generate maze")
+                    print("Please do not set FINISH(target), you need just to select start target and than you can generate maze")
                     time.sleep(FREEZETIME)
                     continue
 
@@ -268,7 +270,6 @@ while RUNNING:
 
     # Початок пошуку
     else:
-
         # Якщо нема старту і кінця кіна не буде аххахаххаа
         if board.start is None or board.target is None:
             print("Please choose position of START(target) and FINISH(target)")
@@ -307,11 +308,25 @@ while RUNNING:
         # Якщо дорога знайдена
         if algorithm.find == True:
             algorithm.output()
+
+            # Write the results to the file
+            result_file.write("Path Found!\n")
+            result_file.write("Algorithm used: " + ALGO + "\n")
+
+            state = board.get_board_state()
+            result_file.write("1)Start: " + str(state["start"]) + "\n")
+            result_file.write("2)Target: " + str(state["target"]) + "\n")
+            result_file.write("3)Path: " + str(state["path"]) + "\n")
+
         else:
             print("Hmm, there is no solution..")
+
+            result_file.write("Path not Found!\n")
+            result_file.write("Algorithm used: " + ALGO + "\n")
 
         # Рестарт гри
         SEARCH = False
         start_button.color_change(colors["green"])
 
+result_file.close()
 CLOCK.tick(FPS)
