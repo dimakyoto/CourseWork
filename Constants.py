@@ -1,5 +1,3 @@
-import pygame.time
-from Maze import *
 from ShowElements import *
 pygame.init()
 
@@ -16,6 +14,9 @@ pygame.display.set_caption("THE SHORTEST PATH IN THE MAZE")
 # FPS
 FPS = 60
 CLOCK = pygame.time.Clock()
+
+# Відкриття файлу перед циклом
+result_file = open("search_results.txt", "w")
 
 # Інтерфейс
 PADDING = 32
@@ -41,15 +42,52 @@ colors = {
     "lightcoral": (240, 128, 128)  # for maze generation
 }
 
-# Змінні константи для мейн-циклу
-RUNNING = True
-SEARCH = False
-DRAW = False
-ERASE = False
-RESET = False
-ALGO = None
-PRESS = False
-board = Board(v_cells, h_cells, board_start[0], board_start[1], cell_size, screen, colors)
+#  Кнопки
+start_button = RectButton(
+    left=PADDING, top=HEIGHT - 2 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="Search Start", textcolor=colors["black"],
+    rectcolor=colors["green"], screen=screen, font=RectButtonFont)
 
-# Відкриття файлу перед циклом
-result_file = open("search_results.txt", "w")
+maze_button = RectButton(
+    left=4.5 * PADDING, top=HEIGHT - 2 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="Maze", textcolor=colors["black"],
+    rectcolor=colors["white"], screen=screen, font=RectButtonFont)
+
+draw_button = RectButton(
+    left=8 * PADDING, top=HEIGHT - 2 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="Draw Wall", textcolor=colors["black"],
+    rectcolor=colors["white"], screen=screen, font=RectButtonFont)
+
+erase_button = RectButton(
+    left=11.5 * PADDING, top=HEIGHT - 2 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="Erase Wall", textcolor=colors["black"],
+    rectcolor=colors["white"], screen=screen, font=RectButtonFont)
+
+reset_button = RectButton(
+    left=15 * PADDING, top=HEIGHT - 2 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="Reset", textcolor=colors["black"],
+    rectcolor=colors["crimson"], screen=screen, font=RectButtonFont)
+
+dijkstra_button = RectButton(
+    left=17 * PADDING, top=3 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="Dijkstra", textcolor=colors["black"],
+    rectcolor=colors["white"], screen=screen, font=RectButtonFont)
+
+astar_man_button = RectButton(
+    left=17 * PADDING, top=6 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="A* (man)", textcolor=colors["black"],
+    rectcolor=colors["white"], screen=screen, font=RectButtonFont)
+
+astar_evk_button = RectButton(
+    left=17 * PADDING, top=9 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="A* (evk)", textcolor=colors["black"],
+    rectcolor=colors["white"], screen=screen, font=RectButtonFont)
+
