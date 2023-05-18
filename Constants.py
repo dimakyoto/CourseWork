@@ -51,3 +51,5 @@ ALGO = None
 PRESS = False
 board = Board(v_cells, h_cells, board_start[0], board_start[1], cell_size, screen, colors)
 
+# Відкриття файлу перед циклом
+result_file = open("search_results.txt", "w")

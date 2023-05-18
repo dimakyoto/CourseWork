@@ -2,57 +2,56 @@ import sys
 from Constants import *
 from Algorithms import *
 from ShowElements import *
+
 FREEZETIME = 0.1
 pygame.init()
-
-result_file = open("search_results.txt", "w")
 
 #  Кнопки
 start_button = RectButton(
     left=PADDING, top=HEIGHT - 2 * PADDING,
-    width=3 * PADDING, height = 1.5 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
     text="Search Start", textcolor=colors["black"],
     rectcolor=colors["green"], screen=screen, font=RectButtonFont)
 
 maze_button = RectButton(
     left=4.5 * PADDING, top=HEIGHT - 2 * PADDING,
-    width=3 * PADDING, height = 1.5 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
     text="Maze", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
 draw_button = RectButton(
     left=8 * PADDING, top=HEIGHT - 2 * PADDING,
-    width=3 * PADDING, height= 1.5 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
     text="Draw Wall", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
 erase_button = RectButton(
-    left= 11.5 * PADDING, top=HEIGHT - 2 * PADDING,
-    width=3 * PADDING, height= 1.5 * PADDING,
+    left=11.5 * PADDING, top=HEIGHT - 2 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
     text="Erase Wall", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
 reset_button = RectButton(
     left=15 * PADDING, top=HEIGHT - 2 * PADDING,
-    width=3 * PADDING, height = 1.5 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
     text="Reset", textcolor=colors["black"],
     rectcolor=colors["crimson"], screen=screen, font=RectButtonFont)
 
 dijkstra_button = RectButton(
     left=17 * PADDING, top=3 * PADDING,
-    width=3 * PADDING, height= 1.5 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
     text="Dijkstra", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
 astar_man_button = RectButton(
-    left=17 * PADDING, top= 6 * PADDING,
-    width=3 * PADDING, height= 1.5 * PADDING,
+    left=17 * PADDING, top=6 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
     text="A* (man)", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
 astar_evk_button = RectButton(
-    left=17 * PADDING, top= 9 * PADDING,
-    width=3 * PADDING, height= 1.5 * PADDING,
+    left=17 * PADDING, top=9 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
     text="A* (evk)", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
@@ -66,9 +65,10 @@ while RUNNING:
     #  Бекграунд
     screen.fill(colors["black"])
 
-
     if not SEARCH:
-        # Малюється дошка та отримуються координати клітинок на дошці, які використовуються для малювання та видалення стін.
+        # Малюється дошка та отримуються координати клітинок на дошці,
+        # які використовуються для малювання та видалення стін.
+        #
         cells = board.draw_board()
 
         # Малювання кнопок
@@ -78,25 +78,23 @@ while RUNNING:
         maze_button()
         reset_button()
 
-
         # Малювання кнопок алгоритму
         dijkstra_button()
         astar_man_button()
         astar_evk_button()
 
         # Натискання RESET
-        if RESET == True:
+        if RESET:
             time.sleep(0.05)
             reset_button.color_change(colors["crimson"])
             reset_button()
             RESET = False
 
             # Write the results to the file
-            result_file.write("RESET pressed\n\n")
+            result_file.write("RESET pressed\n")
 
         # Натискання на мишу
         left, _, right = pygame.mouse.get_pressed()
-
 
         # Якщо ліва кнопка миші натиснута
         if left == 1:
@@ -106,7 +104,7 @@ while RUNNING:
 
             # Кнопка старту
             if start_button.rect.collidepoint(mouse):
-                if SEARCH == False:
+                if not SEARCH:
                     SEARCH = True
                     DRAW = False
                     ERASE = False
@@ -123,7 +121,7 @@ while RUNNING:
 
             # Кнопка рисування стін
             elif draw_button.rect.collidepoint(mouse):
-                if  DRAW == False:
+                if not DRAW:
                     DRAW = True
                     ERASE = False
                     draw_button.color_change(colors["yellow"])
@@ -136,7 +134,7 @@ while RUNNING:
 
                 # Кнопка видалення стін
             elif erase_button.rect.collidepoint(mouse):
-                if  ERASE == False:
+                if not ERASE:
                     ERASE = True
                     DRAW = False
                     erase_button.color_change(colors["yellow"])
@@ -175,7 +173,9 @@ while RUNNING:
                     continue
 
                 elif board.target:
-                    print("Please do not set FINISH(target), you need just to select start target and than you can generate maze")
+                    print(
+                        "Please do not set FINISH(target), you need "
+                        "just to select start target and than you can generate maze")
                     time.sleep(FREEZETIME)
                     continue
 
@@ -195,7 +195,6 @@ while RUNNING:
                 maze_button()
 
                 time.sleep(FREEZETIME)
-
 
             # Кнопки вибору алгоритмів
 
@@ -227,7 +226,6 @@ while RUNNING:
                 astar_evk_button.color_change(colors["yellow"])
                 astar_man_button.color_change(colors["white"])
                 dijkstra_button.color_change(colors["white"])
-
 
                 time.sleep(FREEZETIME)
 
@@ -272,7 +270,7 @@ while RUNNING:
     else:
         # Якщо нема старту і кінця кіна не буде аххахаххаа
         if board.start is None or board.target is None:
-            print("Please choose position of START(target) and FINISH(target)")
+            print("Please choose position of START(target) and FINISH(target) to search")
             SEARCH = False
             start_button.color_change(colors["green"])
             continue
@@ -296,7 +294,7 @@ while RUNNING:
 
         elif ALGO == "AStar_man":
             algorithm = AStar_man(board)
-            algorithm. make_info()
+            algorithm.make_info()
             algorithm.finding_path()
 
 
@@ -306,11 +304,11 @@ while RUNNING:
             algorithm.finding_path()
 
         # Якщо дорога знайдена
-        if algorithm.find == True:
+        if algorithm.find:
             algorithm.output()
 
             # Write the results to the file
-            result_file.write("Path Found!\n")
+            result_file.write("\nPath Found!\n")
             result_file.write("Algorithm used: " + ALGO + "\n")
 
             state = board.get_board_state()
@@ -321,7 +319,7 @@ while RUNNING:
         else:
             print("Hmm, there is no solution..")
 
-            result_file.write("Path not Found!\n")
+            result_file.write("\nPath not Found!\n")
             result_file.write("Algorithm used: " + ALGO + "\n")
 
         # Рестарт гри
