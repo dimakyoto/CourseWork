@@ -1,11 +1,12 @@
 import pygame
 
-
 def type_check(name, correct_type):
     """
-    1. call type_check first，return prop setter，and convert name to private attribute. Store private_name  & correct_type information.
+    1. call type_check first，return prop setter，and convert name to private attribute. Store private_name
+    & correct_type information.
     2. class initializing attribute
-    3. When initailize name attribute，it'll call prop and check type of input. If type is wrong, raise error; or set attribute by setattr function.
+    3. When initialize name attribute，it'll call prop and check type of input. If type is wrong, raise error;
+    or set attribute by setattr function.
     """
     private_name = '_' + name
 
@@ -24,18 +25,18 @@ def type_check(name, correct_type):
 class RectButton:
 
     """
-    _left: ліва межа кнопки (ціле число)
-    _top: верхня межа кнопки (ціле число)
-    _width: ширина кнопки (ціле число)
-    _height: висота кнопки (ціле число)
-    _text: текст кнопки (рядок)
-    _textcolor: колір тексту (кортеж, наприклад: (0, 0, 0))
-    _rectcolor: колір кнопки (кортеж, наприклад: (255, 255, 255))
-    _screen: об'єкт pygame "pygame.display.set_mode()"
-    _font: шрифт тексту
+    _left: left boundary of the button (integer)
+    _top: top boundary of the button (integer)
+    _width: width of the button (integer)
+    _height: height of the button (integer)
+    _text: button text (string)
+    _textcolor: text color (tuple, e.g., (0, 0, 0))
+    _rect_color: button color (tuple, e.g., (255, 255, 255))
+    _screen: pygame screen object "pygame.display.set_mode()"
+    _font: text font
     """
 
-    # Зайвих атрибутів не повинно бути
+    # There should be no unnecessary attributes
     __slots__ = ["_left", "_top", "_width", "_height","_text", "_textcolor", "_rectcolor","_screen", "_font", "rect"]
 
     textcolor = type_check("textcolor", tuple)
@@ -68,15 +69,15 @@ class RectButton:
 
 class ShowText:
     """
-    _center: центр позиціонування тексту (кортеж)
-    _text: список текстів для відображення (список)
-    _textcolor: колір тексту (кортеж)
-    _screen: об'єкт pygame "pygame.display.set_mode()"
-    _font: шрифт тексту
+    _center: center position of the text (tuple)
+    _text: list of texts to display (list)
+    _textcolor: text color (tuple)
+    _screen: pygame screen object "pygame.display.set_mode()"
+    _font: text font
     """
 
-    # Додаткові атрибути не дозволені
-    __slots__ = ["_center", "_text", "_textcolor","_screen", "_font"]
+    # There should be no unnecessary attributes
+    __slots__ = ["_center", "_text", "_textcolor", "_screen", "_font"]
 
     text = type_check("text", list)
     center = type_check("center", tuple)

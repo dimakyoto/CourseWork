@@ -1,20 +1,16 @@
 import pygame
 
-
 class Node:
-
     """
-    Клас Node використовується для створення об'єктів вузлів,
-    які зберігають координати вузла, його батька та дію, що привела до цього вузла.
+    The Node class is used to create node objects that store the node's coordinates, its parent, and the action that led to this node.
 
-    Цей клас дозволяє представляти вузли графа із збереженням інформації про їх взаємозв'язок
-    та дії, пов'язані з переміщенням між вузлами.
+    This class allows representing nodes of a graph while preserving information about their relationships
+    and the actions associated with moving between nodes.
 
     state: position standing --> tuple
-    action: action take to move --> str
-    parent: parent of node --> Node
+    action: action taken to move --> str
+    parent: parent of the node --> Node
     """
-
     def __init__(self, state: tuple, action: str, parent=None):
         self.state = state
         self.parent = parent
@@ -39,9 +35,9 @@ class Node:
 
 class Board:
     """
-    Цей клас дозволяє представляти та відображати стан дошки,
-    включаючи розміщення стін, відвідувані та прохідні комірки, початкову та цільову комірки.
-    Він також надає методи для отримання сусідніх комірок та скидання дошки до початкового стану.
+    This class allows representing and displaying the state of the board,
+    including the placement of walls, visited and passable cells, the start and target cells.
+    It also provides methods to get neighboring cells and reset the board to its initial state.
 
     v_cells: number of vertical cells --> int
     h_cells: number of horizontal cells --> int
@@ -100,8 +96,8 @@ class Board:
 
     def neighbors(self, state: tuple, wall_included=False) -> list:
         """
-       Повертає список можливих дій, які можуть бути виконані з заданої позиції (state).
-       Опціонально можна включити або виключити стіни у списку сусідів.
+        Returns a list of possible actions that can be taken from the given position (state).
+        Optionally, walls can be included or excluded in the list of neighbors.
 
         state: position of node --> tuple
         wall_included: whether walls are included in neighbors
@@ -137,7 +133,7 @@ class Board:
         self.path = list()
 
     def get_board_state(self) -> dict:
-        # Повертає словник з результатами пошуку
+        # Returning dict for text file
         state = {
             "start": self.start,
             "target": self.target,

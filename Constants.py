@@ -1,33 +1,35 @@
 from ShowElements import *
+import pygame
+
 pygame.init()
 
-# Розмір екрану
+# Screen size
 WIDTH, HEIGHT = 650, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-# Шрифт кнопок
+# Button font
 RectButtonFont = pygame.font.SysFont("timesnewroman", 18)
 
-# Назва проги
+# Program title
 pygame.display.set_caption("THE SHORTEST PATH IN THE MAZE")
 
 # FPS
 FPS = 60
 CLOCK = pygame.time.Clock()
 
-# Відкриття файлу перед циклом
+# Open the result file before the loop
 result_file = open("search_results.txt", "w")
 
-# Інтерфейс
+# Interface
 PADDING = 32
 board_height = HEIGHT - 3.5 * PADDING
 board_width = WIDTH - 3.5 * PADDING
 v_cells = 30
 h_cells = 30
-cell_size = int(min(board_height / (v_cells), board_width / (h_cells)))
+cell_size = int(min(board_height / v_cells, board_width / h_cells))
 board_start = (PADDING, PADDING)
 
-# Словник для кольорів
+# Color dictionary
 colors = {
     "black": (0, 0, 0),  # background
     "snow": (250, 250, 250),  # routes in maze
@@ -38,11 +40,11 @@ colors = {
     "lime": (0, 255, 0),  # explored
     "green": (0, 255, 127),  # start button
     "gold": (255, 215, 0),  # shortest path
-    "yellow": (255, 255, 0),  # button color change when its clicked
+    "yellow": (255, 255, 0),  # button color change when it's clicked
     "lightcoral": (240, 128, 128)  # for maze generation
 }
 
-#  Кнопки
+# Buttons
 start_button = RectButton(
     left=PADDING, top=HEIGHT - 2 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,

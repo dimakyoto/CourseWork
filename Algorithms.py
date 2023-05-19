@@ -4,38 +4,40 @@ from Environment import *
 from collections import defaultdict
 from abc import ABCMeta, abstractmethod
 
-INF = float('inf')
-FREEZETIME = 0.01
-DISTANCE = 1
 
 class Search(metaclass=ABCMeta):
 
-    #Абстрактний базовий класс
-    @abstractmethod
+    def __init__(self):
+        self._INF = float('inf')
+        self._TIME = 0.01
+        self._DISTANCE = 1
 
+    @abstractmethod
     def finding_path(self):
-        # Шукає найкоротший шлях
+        # Method finding the shortest path
         pass
 
     def make_info(self):
-        # інформація для розв'зку задачі певним алгоритмом
+        # Method making info for algorithms
         pass
 
     def output(self):
-        # Отримуються комірки для малювання дошки
+        # Method drawing path
+        #
         cells = self.board.draw_board()
 
-        # Знаходиться найкоротший шлях, починаючи з цільового вузла і розвернутає його
+        # The shortest path, then reverse
         node = self.target_node
         while node.parent is not None:
             self.board.path.append(node.state)
             node = node.parent
         self.board.path.reverse()
 
-        # Малює шлях
+        # Drawing path
         color = self.board.colors["gold"]
+
         for i, j in self.board.path:
-            time.sleep(1.5 * FREEZETIME)
+            time.sleep(1.5 * self._TIME)
             rect = cells[i][j]
             pygame.draw.rect(self.board.screen, color, rect)
             pygame.display.flip()
@@ -44,19 +46,23 @@ class Search(metaclass=ABCMeta):
 class Dijkstra(Search):
 
     def __init__(self, board: Board):
+        super().__init__()  # Call the parent class constructor
         self.board = board
         self.find = False
 
-    def  make_info(self):
-        # 1. Список сусідніх клітинок 2. Створює словники node_dict  3. і distance для зберігання вузлів та відстаней між вузлами та початковим вузлом.
-
+    def make_info(self):
+        """
+        1) List of neighboring cells.
+        2) Creates node dictionaries.
+        3) Creates distance dictionaries for storing nodes and distances between nodes and the starting node.
+        """
         self.node_dict = {}
         self.distance = {}
 
-        # створення вузлів
+        # Create nodes
         for i in range(self.board.v_cells):
             for j in range(self.board.h_cells):
-                # якщо (i, j) є стіною, не створювати вузол
+                # If (i, j) is a wall, do not create a node
                 if (i, j) in self.board.wall:
                     continue
 
@@ -68,62 +74,64 @@ class Dijkstra(Search):
                     self.target_node = node
 
                 self.node_dict[pos] = node
-                self.distance[node] = INF
+                self.distance[node] = self._INF
 
         self.distance[self.start_node] = 0
 
-        # додавання сусідніх вузлів до списку сусідів з дією та відстанню
+        # Add neighboring nodes to the adjacency list with action and distance
         self.adj_list = defaultdict(dict)
         for _, node in self.node_dict.items():
-            # отримати можливі позиції сусідніх вузлів
+            # Get possible positions of neighboring nodes
             neighbors = self.board.neighbors(node.state)
             for action, (row, col) in neighbors:
-                # отримати сусідній вузол зі словника вузлів
+                # Get the neighboring node from the node dictionary
                 neighbor_node = self.node_dict[(row, col)]
-                # оновити список сусідів
-                self.adj_list[node][neighbor_node] = [action, DISTANCE]
+                # Update the adjacency list
+                self.adj_list[node][neighbor_node] = [action, self._DISTANCE]
 
     def update_distance_and_enqueue(self, node: Node, neighbor: Node):
-        # Оновлює словник distance для кожного вузла та додає вузол у чергу за допомогою відстані.
-
+        """
+        Updates the distance dictionary for each node and enqueues the node based on distance.
+        """
         if self.distance[neighbor] > self.distance[node] + self.adj_list[node][neighbor][1]:
-            # оновити відстань
+            # Update the distance
             self.distance[neighbor] = self.distance[node] + self.adj_list[node][neighbor][1]
 
-            # оновити батька та дію
+            # Update the parent and action
             neighbor.parent = node
             neighbor.action = self.adj_list[node][neighbor][0]
 
-            # додати сусіда до черги
+            # Add the neighbor to the queue
             self.entry_count += 1
             heapq.heappush(self.heap, (self.distance[neighbor], self.entry_count, neighbor))
 
     def finding_path(self):
-        # Під час додавання вузла до черги та якщо існують рівні значення відстаней,
-        # черга буде розташовувати ці вузли у порядку часу вступу.
+        """
+        During node enqueueing, if there are equal distance values, the queue will prioritize nodes based on entry time.
+        """
 
         self.heap = []
         self.entry_count = 1
         heapq.heappush(self.heap, (self.distance[self.start_node], self.entry_count, self.start_node))
 
-        while self.heap and self.find == False:
-            time.sleep(FREEZETIME)
-            # Вилучення мінімального елемента
+        while self.heap and not self.find:
+            time.sleep(self._TIME)
+            # Extract the minimum element
             (_, _, node) = heapq.heappop(self.heap)
 
-            # Якщо знайдено цільовий вузол, встановити self.find == True
+            # If the target node is found, set self.find to True
             if node.state == self.target_node.state:
                 self.find = True
 
-            # Позначити вузол як відвіданий
+            # Mark the node as visited
             self.board.visited.add(node)
             self.board.draw_board(return_cells=False)
 
-            # Якщо вузол не має вихідних ребер, продовжувати цикл while
+            # If the node has no outgoing edges, continue the while loop
             if not self.adj_list[node]:
                 continue
 
-            # Якщо є вихідні ребра, ітерувати через всі ребра
+            # If there are outgoing edges, iterate through all the edges
             for neighbor in self.adj_list[node]:
                 if neighbor not in self.board.visited:
                     self.update_distance_and_enqueue(node, neighbor)
@@ -131,14 +139,19 @@ class Dijkstra(Search):
             pygame.display.flip()
 
 
-class AStar_man(Search):
-
+class AStarManhattan(Search):
     def __init__(self, board: Board):
+        super().__init__()  # Call the parent class constructor
         self.board = board
         self.find = False
 
-    def  make_info(self):
-        # 1. Список сусідніх клітинок 2. Створює словники node_dict(ключ - координати вершини; значення - сама вершина) 3. словник g_scores 4. словник h_scores
+    def make_info(self):
+        """
+        Creates necessary data structures for the A* Manhattan algorithm:
+        1. node_dict: dictionary mapping node coordinates to node objects.
+        2. g_scores: dictionary to store the g-scores (path costs) for each node.
+        3. h_scores: dictionary to store the h-scores (heuristic estimates) for each node.
+        """
 
         self.node_dict = {}
         self.g_scores = {}
@@ -157,7 +170,7 @@ class AStar_man(Search):
                     self.target_node = node
 
                 self.node_dict[pos] = node
-                self.g_scores[node] = INF
+                self.g_scores[node] = self._INF
                 self.h_scores[node] = 0
 
         self.g_scores[self.start_node] = 0
@@ -167,71 +180,51 @@ class AStar_man(Search):
             neighbors = self.board.neighbors(node.state)
             for action, (row, col) in neighbors:
                 neighbor_node = self.node_dict[(row, col)]
-                self.adj_list[node][neighbor_node] = [action, DISTANCE]
+                self.adj_list[node][neighbor_node] = [action, self._DISTANCE]
 
     def update_distance_and_enqueue(self, node: Node, neighbor: Node):
-
-        # оновлюється значення g_scores для кожного вузла та додається вузол до черги згідно зі значеннями g_scores та h_scores.
-
         """
-        node: selected visited node --> Node
-        neighbor: neighboring nodes haven't been visited --> Node
+        Updates the g-scores for each node and enqueues the neighbor node based on the g-scores and h-scores.
         """
-
-        # Якщо значення g_scores для сусіднього вузла більше, ніж сума значень g_scores поточного вузла та відстані до сусіднього вузла:
         if self.g_scores[neighbor] > self.g_scores[node] + self.adj_list[node][neighbor][1]:
-            # оновити відстань
             self.g_scores[neighbor] = self.g_scores[node] + self.adj_list[node][neighbor][1]
-
-            # оновити батька та виконану дію
             neighbor.parent = node
             neighbor.action = self.adj_list[node][neighbor][0]
-
-            # додати сусіда до черги
             self.entry_count += 1
-            self.h_scores[neighbor] = AStar_man.manhattan(neighbor, self.target_node)
+            self.h_scores[neighbor] = AStarManhattan.manhattan(neighbor, self.target_node)
             heapq.heappush(self.heap, (self.g_scores[neighbor] + self.h_scores[neighbor], self.entry_count, neighbor))
 
     @staticmethod
     def manhattan(node_1: Node, node_2: Node) -> int:
         """
-        У статичному методі manhattan обчислюється відстань між двома вузлами за допомогою мангаттанської метрики.
-
-        node_1: first node to be computed --> Node
-        node_2: second node to be computed --> Node
+        Computes the Manhattan distance between two nodes.
         """
-
         start_x, start_y = node_1.state
         target_x, target_y = node_2.state
         return abs(start_x - target_x) + abs(start_y - target_y)
 
     def finding_path(self):
-        # Під час додавання вузла до черги та якщо існують рівні значення відстаней,
-        # черга буде розташовувати ці вузли у порядку часу вступу.
-
+        """
+        During node enqueueing, if there are equal distance values, the queue will prioritize nodes based on entry time.
+        """
         self.heap = []
         self.entry_count = 1
-        h_score_s2t = AStar_man.manhattan(self.start_node, self.target_node)  # h_score від початку до цільового вузла
+        h_score_s2t = AStarManhattan.manhattan(self.start_node, self.target_node)
         heapq.heappush(self.heap, (h_score_s2t, self.entry_count, self.start_node))
 
         while self.heap and not self.find:
-            time.sleep(FREEZETIME)
-            # Вилучення мінімального елемента
+            time.sleep(self._TIME)
             _, _, node = heapq.heappop(self.heap)
 
-            # Якщо знайдено цільовий вузол, встановити self.find == True
             if node.state == self.target_node.state:
                 self.find = True
 
-            # Позначити вузол як відвіданий
             self.board.visited.add(node)
             self.board.draw_board(return_cells=False)
 
-            # Якщо вузол не має вихідних ребер, продовжувати цикл while
             if not self.adj_list[node]:
                 continue
 
-            # Якщо є вихідні ребра, ітерувати через всі ребра
             for neighbor in self.adj_list[node]:
                 if neighbor not in self.board.visited:
                     self.update_distance_and_enqueue(node, neighbor)
@@ -239,15 +232,19 @@ class AStar_man(Search):
             pygame.display.flip()
 
 
-class AStar_evk(Search):
-
+class AStarEuclidean(Search):
     def __init__(self, board: Board):
+        super().__init__()  # Call the parent class constructor
         self.board = board
         self.find = False
 
-    def  make_info(self):
-
-         # 1. Список сусідніх клітинок 2. Створює словники node_dict(ключ - координати вершини; значення - сама вершина) 3. словник g_scores 4. словник h_scores
+    def make_info(self):
+        """
+        Creates necessary data structures for the A* Euclidean algorithm:
+        1. node_dict: dictionary mapping node coordinates to node objects.
+        2. g_scores: dictionary to store the g-scores (path costs) for each node.
+        3. h_scores: dictionary to store the h-scores (heuristic estimates) for each node.
+        """
 
         self.node_dict = {}
         self.g_scores = {}
@@ -266,7 +263,7 @@ class AStar_evk(Search):
                     self.target_node = node
 
                 self.node_dict[pos] = node
-                self.g_scores[node] = INF
+                self.g_scores[node] = self._INF
                 self.h_scores[node] = 0
 
         self.g_scores[self.start_node] = 0
@@ -276,74 +273,55 @@ class AStar_evk(Search):
             neighbors = self.board.neighbors(node.state)
             for action, (row, col) in neighbors:
                 neighbor_node = self.node_dict[(row, col)]
-                self.adj_list[node][neighbor_node] = [action, DISTANCE]
+                self.adj_list[node][neighbor_node] = [action, self._DISTANCE]
 
     def update_distance_and_enqueue(self, node: Node, neighbor: Node):
-
-        # оновлюється значення g_scores для кожного вузла та додається вузол до черги згідно зі значеннями g_scores та h_scores.
-
         """
-        node: selected visited node --> Node
-        neighbor: neighboring nodes haven't been visited --> Node
+        Updates the g-scores for each node and enqueues the neighbor node based on the g-scores and h-scores.
         """
         if self.g_scores[neighbor] > self.g_scores[node] + self.adj_list[node][neighbor][1]:
-            # оновити відстань
             self.g_scores[neighbor] = self.g_scores[node] + self.adj_list[node][neighbor][1]
-
-            # оновити батька та дію
             neighbor.parent = node
             neighbor.action = self.adj_list[node][neighbor][0]
-
-            # додати сусіда до черги
             self.entry_count += 1
-            self.h_scores[neighbor] = AStar_evk.euclidean(neighbor, self.target_node)
+            self.h_scores[neighbor] = AStarEuclidean.euclidean(neighbor, self.target_node)
             heapq.heappush(self.heap, (self.g_scores[neighbor] + self.h_scores[neighbor], self.entry_count, neighbor))
 
     @staticmethod
     def euclidean(node_1: Node, node_2: Node) -> float:
-
         """
-        У статичному методі euclidean обчислюється відстань між двома вузлами за допомогою евклідової метрики.
-        node_1: first node to be computed --> Node
-        node_2: second node to be computed --> Node
+        Computes the Euclidean distance between two nodes.
         """
-
         start_x, start_y = node_1.state
         target_x, target_y = node_2.state
         return ((start_x - target_x) ** 2 + (start_y - target_y) ** 2) ** 0.5
 
     def finding_path(self):
-
-        # При додаванні вузла у купу (heap) з однаковими значеннями відстані,
-        # купа буде впорядковувати ці вузли за часом їх входу.
+        """
+        Finds the path using the A* Euclidean algorithm.
+        During node enqueueing, if there are equal distance values, the queue will prioritize nodes based on entry time.
+        """
         self.heap = []
         self.entry_count = 1
-        h_score_s2t = AStar_evk.euclidean(self.start_node, self.target_node)
+
+        h_score_s2t = AStarEuclidean.euclidean(self.start_node, self.target_node)
         heapq.heappush(self.heap, (h_score_s2t, self.entry_count, self.start_node))
 
         while self.heap and not self.find:
-            time.sleep(FREEZETIME)
-            # Вилучення найменшого
+            time.sleep(self._TIME)
             _, _, node = heapq.heappop(self.heap)
 
-            # Якщо знайдено цільовий вузол, встановити self.find == True
             if node.state == self.target_node.state:
                 self.find = True
 
-            # Позначити вузол як відвіданий
             self.board.visited.add(node)
             self.board.draw_board(return_cells=False)
 
-            # Якщо немає вихідних ребер, продовжити цикл while
             if not self.adj_list[node]:
                 continue
 
-            # Якщо є вихідні ребра, перебір усіх ребер
             for neighbor in self.adj_list[node]:
                 if neighbor not in self.board.visited:
                     self.update_distance_and_enqueue(node, neighbor)
 
             pygame.display.flip()
-
-
-
