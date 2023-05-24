@@ -65,34 +65,3 @@ class RectButton:
 
     def color_change(self, color: tuple):
         self.rectcolor = color
-
-
-class ShowText:
-    """
-    _center: center position of the text (tuple)
-    _text: list of texts to display (list)
-    _textcolor: text color (tuple)
-    _screen: pygame screen object "pygame.display.set_mode()"
-    _font: text font
-    """
-
-    # There should be no unnecessary attributes
-    __slots__ = ["_center", "_text", "_textcolor", "_screen", "_font"]
-
-    text = type_check("text", list)
-    center = type_check("center", tuple)
-    textcolor = type_check("textcolor", tuple)
-
-    def __init__(self, center: tuple, text: list, textcolor: tuple, screen: pygame, font: pygame):
-        self._screen = screen
-        self._font = font
-        self.center = center
-        self.text = text
-        self.textcolor = textcolor
-
-    def __call__(self):
-        for text in self._text:
-            showtext = self._font.render(text, True, self._textcolor)
-            textrect = showtext.get_rect()
-            textrect.center = self._center
-            self._screen.blit(showtext, textrect)

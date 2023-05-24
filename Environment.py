@@ -1,4 +1,4 @@
-import pygame
+from Constants import *
 
 class Node:
     """

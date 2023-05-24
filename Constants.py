@@ -24,9 +24,6 @@ result_file = open("search_results.txt", "w")
 PADDING = 32
 board_height = HEIGHT - 3.5 * PADDING
 board_width = WIDTH - 3.5 * PADDING
-v_cells = 30
-h_cells = 30
-cell_size = int(min(board_height / v_cells, board_width / h_cells))
 board_start = (PADDING, PADDING)
 
 # Color dictionary
@@ -41,7 +38,10 @@ colors = {
     "green": (0, 255, 127),  # start button
     "gold": (255, 215, 0),  # shortest path
     "yellow": (255, 255, 0),  # button color change when it's clicked
-    "lightcoral": (240, 128, 128)  # for maze generation
+    "lightcoral": (240, 128, 128),  # for maze generation
+    "blue": (0, 0, 255),  # active
+    "deepskyblue": (0, 191, 255),  # inactive
+    "gainsboro": (220, 220, 220),  # maze size filling
 }
 
 # Buttons
@@ -93,3 +93,14 @@ astar_evk_button = RectButton(
     text="A* (evk)", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
+maze_size_button = RectButton(
+    left=17 * PADDING, top=12 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="Size", textcolor=colors["black"],
+    rectcolor=colors["white"], screen=screen, font=RectButtonFont)
+
+back_button = RectButton(
+    left=8.5 * PADDING, top=HEIGHT - 7.5 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="Back", textcolor=colors["black"],
+    rectcolor=colors["crimson"], screen=screen, font=RectButtonFont)

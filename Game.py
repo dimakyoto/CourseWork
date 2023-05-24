@@ -1,5 +1,5 @@
 import sys
-from Constants import *
+from pygame.locals import *
 from Algorithms import *
 from Maze import *
 
@@ -15,7 +15,80 @@ class Game:
         self.__ALGO = None
         self.__PRESS = False
         self.__TIME = 0.1
-        self.__board = Board(v_cells, h_cells, board_start[0], board_start[1], cell_size, screen, colors)
+        self.__v_cells = 50
+        self.__h_cells = 50
+        self.__cell_size = int(min(board_height / self.__v_cells, board_width / self.__h_cells))
+        self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1], self.__cell_size, screen,
+                             colors)
+
+    def input_field(self):
+        input_box = pygame.Rect(225, 285, 100, 32)
+        color_inactive = pygame.Color(colors["deepskyblue"])
+        color_active = pygame.Color(colors["blue"])
+
+        color = color_inactive
+        active = False
+        text = ''
+
+        instruction_font = pygame.font.SysFont("timesnewroman", 24)
+        instruction_text = instruction_font.render("Enter size of the maze (f.e. 30): ", True, (colors["black"]))
+        instruction_text_rect = instruction_text.get_rect(center=(WIDTH // 2, 250))
+
+        ps_text_font = pygame.font.SysFont("timesnewroman", 20)
+        ps_text = ps_text_font.render("Warning, the input number must be lower or equal to 50!!!", True,
+                                      colors["crimson"])
+        ps_text_rect = ps_text.get_rect(bottomleft=(10, HEIGHT - 10))
+
+        cursor_color = pygame.Color("black")
+        cursor_visible = True
+        cursor_timer = 0
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == MOUSEBUTTONDOWN:
+                    if input_box.collidepoint(event.pos):
+                        active = not active
+                    else:
+                        active = False
+                    color = color_active if active else color_inactive
+                    if back_button.rect.collidepoint(event.pos):
+                        return
+                if event.type == KEYDOWN:
+                    if active:
+                        if event.key == K_RETURN:
+                            return int(text)
+                        elif event.key == K_BACKSPACE:
+                            text = text[:-1]
+                        else:
+                            text += event.unicode
+
+            screen.fill((colors["gainsboro"]))
+            txt_surface = RectButtonFont.render(text, True, colors["black"])
+            width = max(200, txt_surface.get_width() + 10)
+            input_box.w = width
+
+            screen.blit(instruction_text, instruction_text_rect)
+            screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+            pygame.draw.rect(screen, color, input_box, 2)
+            screen.blit(ps_text, ps_text_rect)
+
+            # Мигающий курсор
+            if active:
+                cursor_timer += CLOCK.get_time()
+                if cursor_timer >= 500:
+                    cursor_visible = not cursor_visible
+                    cursor_timer = 0
+
+            if cursor_visible and active:
+                cursor_pos = (input_box.x + txt_surface.get_width() + 10, input_box.y + 10)
+                pygame.draw.line(screen, cursor_color, cursor_pos,
+                                 (cursor_pos[0], cursor_pos[1] + input_box.height - 20), 2)
+            back_button()
+            pygame.display.flip()
+            CLOCK.tick(FPS)
 
     def main_loop(self):
         while self.__RUNNING:
@@ -38,6 +111,7 @@ class Game:
                 erase_button()
                 maze_button()
                 reset_button()
+                maze_size_button()
 
                 # Drawing an algorithms buttons
                 dijkstra_button()
@@ -155,40 +229,103 @@ class Game:
 
                         time.sleep(self.__TIME)
 
+                    # SIZE-Button
+                    elif maze_size_button.rect.collidepoint(mouse):
+
+                        if self.__board.wall:
+                            print("Please press RESET(button) to reset the Board")
+                            time.sleep(self.__TIME)
+                            continue
+
+                        self.__DRAW = False
+                        self.__ERASE = False
+                        draw_button.color_change(colors["white"])
+                        erase_button.color_change(colors["white"])
+                        maze_button.color_change(colors["white"])
+                        maze_button.color_change(colors["white"])
+                        maze_size_button.color_change(colors["yellow"])
+
+                        new_size = self.input_field()
+
+                        if new_size is None:
+                            # User canceled the input, handle it accordingly
+                            maze_size_button.color_change(colors["white"])
+                            continue
+
+                        if new_size > 50:
+                            print("Please enter a size less than or equal to 50")
+                            time.sleep(self.__TIME)
+                            continue
+
+                        maze_size_button.color_change(colors["white"])
+
+                        self.__v_cells, self.__h_cells = new_size, new_size
+                        self.__cell_size = int(min(board_height / self.__v_cells, board_width / self.__h_cells))
+                        self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1],
+                                             self.__cell_size, screen,
+                                             colors)
+                        cells = self.__board.draw_board()
+
+                        time.sleep(self.__TIME)
+
                     # Choosing Algorithm, Dijkstra
                     if dijkstra_button.rect.collidepoint(mouse):
-                        self.__ALGO = "Dijkstra"
+                        if self.__ALGO != "Dijkstra":
+                            self.__ALGO = "Dijkstra"
 
-                        dijkstra_button.color_change(colors["yellow"])
-                        astar_man_button.color_change(colors["white"])
-                        astar_evk_button.color_change(colors["white"])
+                            dijkstra_button.color_change(colors["yellow"])
+                            astar_man_button.color_change(colors["white"])
+                            astar_evk_button.color_change(colors["white"])
 
-                        time.sleep(self.__TIME)
+                            time.sleep(self.__TIME)
+                        else:
+                            self.__ALGO = None
+                            dijkstra_button.color_change(colors["white"])
+                            astar_man_button.color_change(colors["white"])
+                            astar_evk_button.color_change(colors["white"])
 
-                    # А* manhattan
+                            time.sleep(self.__TIME)
+
+                    # А* Manhattan
                     elif astar_man_button.rect.collidepoint(mouse):
-                        self.__ALGO = "AStarManhattan"
+                        if self.__ALGO != "AStarManhattan":
+                            self.__ALGO = "AStarManhattan"
 
-                        astar_man_button.color_change(colors["yellow"])
-                        dijkstra_button.color_change(colors["white"])
-                        astar_evk_button.color_change(colors["white"])
+                            astar_man_button.color_change(colors["yellow"])
+                            dijkstra_button.color_change(colors["white"])
+                            astar_evk_button.color_change(colors["white"])
 
-                        time.sleep(self.__TIME)
+                            time.sleep(self.__TIME)
+                        else:
+                            self.__ALGO = None
+                            astar_man_button.color_change(colors["white"])
+                            dijkstra_button.color_change(colors["white"])
+                            astar_evk_button.color_change(colors["white"])
 
-                    # А* euclidian
+                            time.sleep(self.__TIME)
+
+                    # А* Euclidean
                     elif astar_evk_button.rect.collidepoint(mouse):
-                        self.__ALGO = "AStarEuclidean"
+                        if self.__ALGO != "AStarEuclidean":
+                            self.__ALGO = "AStarEuclidean"
 
-                        astar_evk_button.color_change(colors["yellow"])
-                        astar_man_button.color_change(colors["white"])
-                        dijkstra_button.color_change(colors["white"])
+                            astar_evk_button.color_change(colors["yellow"])
+                            astar_man_button.color_change(colors["white"])
+                            dijkstra_button.color_change(colors["white"])
 
-                        time.sleep(self.__TIME)
+                            time.sleep(self.__TIME)
+                        else:
+                            self.__ALGO = None
+                            astar_evk_button.color_change(colors["white"])
+                            astar_man_button.color_change(colors["white"])
+                            dijkstra_button.color_change(colors["white"])
+
+                            time.sleep(self.__TIME)
 
                     # Drawing and Erasing Logic
                     else:
-                        for i in range(v_cells):
-                            for j in range(h_cells):
+                        for i in range(self.__v_cells):
+                            for j in range(self.__h_cells):
                                 cell = cells[i][j]
                                 if (i, j) != self.__board.start or (i, j) != self.__board.target:
                                     if self.__DRAW and cell.collidepoint(mouse):
@@ -200,23 +337,24 @@ class Game:
                 elif right == 1:
                     mouse = pygame.mouse.get_pos()
 
-                    for i in range(v_cells):
-                        for j in range(h_cells):
-                            cell = cells[i][j]
-                            if cell.collidepoint(mouse):
-                                # if it's not wall and start has not been created, create start
-                                if (i, j) not in self.__board.wall and self.__board.start is None:
-                                    self.__board.start = (i, j)
-                                # if it's not wall and start, and target has not been created, create target
-                                elif (i, j) not in self.__board.wall and (
-                                        i, j) != self.__board.start and self.__board.target is None:
-                                    self.__board.target = (i, j)
-                                # if it's start and target has not been created, chancel start
-                                elif (i, j) == self.__board.start and self.__board.target is None:
-                                    self.__board.start = None
-                                # if it's target, chancel target
-                                elif (i, j) == self.__board.target:
-                                    self.__board.target = None
+                    for i in range(self.__v_cells):
+                        for j in range(self.__h_cells):
+                            if i < self.__v_cells and j < self.__h_cells:
+                                cell = cells[i][j]
+                                if cell.collidepoint(mouse):
+                                    # if it's not wall and start has not been created, create start
+                                    if (i, j) not in self.__board.wall and self.__board.start is None:
+                                        self.__board.start = (i, j)
+                                    # if it's not wall and start, and target has not been created, create target
+                                    elif (i, j) not in self.__board.wall and (
+                                            i, j) != self.__board.start and self.__board.target is None:
+                                        self.__board.target = (i, j)
+                                    # if it's start and target has not been created, chancel start
+                                    elif (i, j) == self.__board.start and self.__board.target is None:
+                                        self.__board.start = None
+                                    # if it's target, chancel target
+                                    elif (i, j) == self.__board.target:
+                                        self.__board.target = None
 
                     time.sleep(self.__TIME)
 
