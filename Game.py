@@ -119,7 +119,10 @@ class Game:
                 reset_button()
 
                 # Drawing an algorithms buttons
-                text_field.draw(screen)
+                Comparisons.draw(screen)
+                Iterations.draw(screen)
+                Visited_cells.draw(screen)
+                Execution_time.draw(screen)
                 dijkstra_button()
                 astar_man_button()
                 astar_evk_button()
@@ -416,21 +419,54 @@ class Game:
 
                     algorithm_info = algorithm.get_info()
 
-                    formatted_info = " - Iterations: " + str(algorithm_info["iterations"]) + "\n"
-                    formatted_info += " - Comparisons: " + str(algorithm_info["comparisons"]) + "\n"
-                    formatted_info += " - Visited Nodes: " + str(algorithm_info["visited_cells"]) + "\n"
-                    formatted_info += " - Time: " + str(algorithm_info["execution_time"]) + "\n"
-                    # Clearing
-                    text_field.set_text("")
-                    # Displaying text
-                    text_field.set_text(formatted_info)
-                    text_field.draw(screen)
+                    Comparisons_info = "1)Comparisons: " + str(algorithm_info["comparisons"])
+                    Comparisons.set_text("")
+                    Comparisons.set_text(Comparisons_info)
+                    Comparisons.draw(screen)
+
+                    Iterations_info = "2)Iterations: " + str(algorithm_info["iterations"])
+                    Iterations.set_text("")
+                    Iterations.set_text(Iterations_info)
+                    Iterations.draw(screen)
+
+                    Visited_cells_info = "3)Visited Nodes: " + str(algorithm_info["visited_cells"])
+                    Visited_cells.set_text("")
+                    Visited_cells.set_text(Visited_cells_info)
+                    Visited_cells.draw(screen)
+
+                    Execution_time_info = "4)Execution time: " + str(algorithm_info["execution_time"])
+                    Execution_time.set_text("")
+                    Execution_time.set_text(Execution_time_info)
+                    Execution_time.draw(screen)
+
                 else:
                     print("Hmm, there is no solution..")
 
                     # Write negative results to the file
                     result_file.write("\nPath not Found!\n")
                     result_file.write("Algorithm used: " + self.__ALGO + "\n")
+
+                    algorithm_info = algorithm.get_info()
+
+                    Comparisons_info = "1)Comparisons: " + str(algorithm_info["comparisons"])
+                    Comparisons.set_text("")
+                    Comparisons.set_text(Comparisons_info)
+                    Comparisons.draw(screen)
+
+                    Iterations_info = "2)Iterations: " + str(algorithm_info["iterations"])
+                    Iterations.set_text("")
+                    Iterations.set_text(Iterations_info)
+                    Iterations.draw(screen)
+
+                    Visited_cells_info = "3)Visited Nodes: " + str(algorithm_info["visited_cells"])
+                    Visited_cells.set_text("")
+                    Visited_cells.set_text(Visited_cells_info)
+                    Visited_cells.draw(screen)
+
+                    Execution_time_info = "4)Execution time: " + str(algorithm_info["execution_time"])
+                    Execution_time.set_text("")
+                    Execution_time.set_text(Execution_time_info)
+                    Execution_time.draw(screen)
 
                 # RESTART program
                 self.__SEARCH = False

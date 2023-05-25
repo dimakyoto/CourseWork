@@ -27,8 +27,11 @@ board_height = HEIGHT - 3.5 * PADDING
 board_width = WIDTH - 3.5 * PADDING
 board_start = (PADDING, PADDING)
 
-# Text field with complexity res
-text_field = TextField(x=520, y=32, width=250, height=150)
+# Complexity results
+Comparisons = TextField(x=520, y=32, width=250, height=37.5)
+Iterations = TextField(x=520, y=69, width=250, height=37.5)
+Visited_cells = TextField(x=520, y=106, width=250, height=37.5)
+Execution_time = TextField(x=520, y=143, width=250, height=37.5)
 
 # Input line for size changing
 input_line = pygame.Rect(300, 300, 100, 32)

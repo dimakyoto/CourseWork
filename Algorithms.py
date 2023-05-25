@@ -14,7 +14,9 @@ class Search(metaclass=ABCMeta):
         self.visited_cells = 0
         self.comparisons = 0
         self.swaps = 0
+        self.start_time = 0
         self.execution_time = 0
+        self.end_time = 0
 
 
     @abstractmethod
@@ -48,11 +50,12 @@ class Search(metaclass=ABCMeta):
             pygame.display.flip()
 
     def get_info(self):
+        execution_time = round(self.execution_time, 2)
         return {
             'iterations': self.swaps,
             'comparisons': self.comparisons,
             'visited_cells': self.visited_cells,
-            'execution_time': self.execution_time
+            'execution_time': execution_time
         }
 
 
@@ -71,6 +74,7 @@ class Dijkstra(Search):
         """
         self.node_dict = {}
         self.distance = {}
+        self.start_time = time.time()
 
         # Create nodes
         for i in range(self.board.v_cells):
@@ -128,7 +132,6 @@ class Dijkstra(Search):
 
         self.heap = []
         self.entry_count = 1
-        start_time = time.time()
         heapq.heappush(self.heap, (self.distance[self.start_node], self.entry_count, self.start_node))
 
         while self.heap and not self.find:
@@ -153,8 +156,8 @@ class Dijkstra(Search):
                 if neighbor not in self.board.visited:
                     self.update_distance_and_enqueue(node, neighbor)
 
-            end_time = time.time()
-            execution_time = end_time - start_time
+            self.end_time = time.time()
+            self.execution_time = self.end_time - self.start_time
             pygame.display.flip()
 
 
@@ -175,6 +178,7 @@ class AStarManhattan(Search):
         self.node_dict = {}
         self.g_scores = {}
         self.h_scores = {}
+        self.start_time = time.time()
 
         for i in range(self.board.v_cells):
             for j in range(self.board.h_cells):
@@ -231,7 +235,7 @@ class AStarManhattan(Search):
         """
         self.heap = []
         self.entry_count = 1
-        start_time = time.time()
+
         h_score_s2t = AStarManhattan.manhattan(self.start_node, self.target_node)
         heapq.heappush(self.heap, (h_score_s2t, self.entry_count, self.start_node))
 
@@ -252,8 +256,8 @@ class AStarManhattan(Search):
                 if neighbor not in self.board.visited:
                     self.update_distance_and_enqueue(node, neighbor)
 
-            end_time = time.time()  # End time measurement
-            execution_time = end_time - start_time
+            self.end_time = time.time()
+            self.execution_time = self.end_time - self.start_time
             pygame.display.flip()
 
 
@@ -274,6 +278,7 @@ class AStarEuclidean(Search):
         self.node_dict = {}
         self.g_scores = {}
         self.h_scores = {}
+        self.start_time = time.time()
 
         for i in range(self.board.v_cells):
             for j in range(self.board.h_cells):
@@ -331,7 +336,7 @@ class AStarEuclidean(Search):
         """
         self.heap = []
         self.entry_count = 1
-        start_time = time.time()
+
         h_score_s2t = AStarEuclidean.euclidean(self.start_node, self.target_node)
         heapq.heappush(self.heap, (h_score_s2t, self.entry_count, self.start_node))
 
@@ -352,6 +357,6 @@ class AStarEuclidean(Search):
                 if neighbor not in self.board.visited:
                     self.update_distance_and_enqueue(node, neighbor)
 
-            end_time = time.time()
-            execution_time = end_time - start_time
+            self.end_time = time.time()
+            self.execution_time = self.end_time - self.start_time
             pygame.display.flip()

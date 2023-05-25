@@ -64,18 +64,17 @@ class RectButton:
     def color_change(self, color: tuple):
         self.rectcolor = color
 
-class TextField:
+import pygame
 
+class TextField:
     text = type_check("text", str)
     x = type_check("x", int)
     y = type_check("y", int)
-    width = type_check("width", int)
-    height = type_check("height", int)
     font_size = type_check("font_size", int)
     font_color = type_check("font_color", tuple)
     background_color = type_check("background_color", tuple)
 
-    def __init__(self, x, y, width, height, font_size=24, font_color=(0, 0, 0), background_color=(255, 255, 255)):
+    def __init__(self, x, y, width, height, font_size=18, font_color=(0, 0, 0), background_color=(255, 255, 255)):
         self.x = x
         self.y = y
         self.width = width
@@ -100,7 +99,7 @@ class TextField:
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.background_color, (self.x, self.y, self.width, self.height))
-        font = pygame.font.Font(None, self.font_size)
+        font = pygame.font.SysFont("timesnewroman", self.font_size)
         text_surface = font.render(self.text, True, self.font_color)
         screen.blit(text_surface, (self.x, self.y))
 
