@@ -4,10 +4,11 @@ import pygame
 pygame.init()
 
 # Screen size
-WIDTH, HEIGHT = 650, 600
+WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-# Button font
+# Fonts
+Instruction_font = pygame.font.SysFont("timesnewroman", 24)
 RectButtonFont = pygame.font.SysFont("timesnewroman", 18)
 
 # Program title
@@ -25,6 +26,12 @@ PADDING = 32
 board_height = HEIGHT - 3.5 * PADDING
 board_width = WIDTH - 3.5 * PADDING
 board_start = (PADDING, PADDING)
+
+# Text field with complexity res
+text_field = TextField(x=520, y=32, width=250, height=150)
+
+# Input line for size changing
+input_line = pygame.Rect(300, 300, 100, 32)
 
 # Color dictionary
 colors = {
@@ -47,60 +54,60 @@ colors = {
 # Buttons
 start_button = RectButton(
     left=PADDING, top=HEIGHT - 2 * PADDING,
-    width=3 * PADDING, height=1.5 * PADDING,
+    width=3 * PADDING, height= 1.5 * PADDING,
     text="Search Start", textcolor=colors["black"],
     rectcolor=colors["green"], screen=screen, font=RectButtonFont)
 
 maze_button = RectButton(
     left=4.5 * PADDING, top=HEIGHT - 2 * PADDING,
-    width=3 * PADDING, height=1.5 * PADDING,
+    width=3 * PADDING, height= 1.5 * PADDING,
     text="Maze", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
-draw_button = RectButton(
+maze_size_button = RectButton(
     left=8 * PADDING, top=HEIGHT - 2 * PADDING,
+    width=3 * PADDING, height=1.5 * PADDING,
+    text="Size", textcolor=colors["black"],
+    rectcolor=colors["white"], screen=screen, font=RectButtonFont)
+
+draw_button = RectButton(
+    left=11.5 * PADDING, top=HEIGHT - 2 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="Draw Wall", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
 erase_button = RectButton(
-    left=11.5 * PADDING, top=HEIGHT - 2 * PADDING,
+    left=15 * PADDING, top=HEIGHT - 2 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="Erase Wall", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
 reset_button = RectButton(
-    left=15 * PADDING, top=HEIGHT - 2 * PADDING,
+    left=18.5 * PADDING, top=HEIGHT - 2 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="Reset", textcolor=colors["black"],
     rectcolor=colors["crimson"], screen=screen, font=RectButtonFont)
 
 dijkstra_button = RectButton(
-    left=17 * PADDING, top=3 * PADDING,
+    left=18.5 * PADDING, top=7 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="Dijkstra", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
 astar_man_button = RectButton(
-    left=17 * PADDING, top=6 * PADDING,
+    left=18.5 * PADDING, top=10 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="A* (man)", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
 astar_evk_button = RectButton(
-    left=17 * PADDING, top=9 * PADDING,
+    left=18.5 * PADDING, top=13 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="A* (evk)", textcolor=colors["black"],
     rectcolor=colors["white"], screen=screen, font=RectButtonFont)
 
-maze_size_button = RectButton(
-    left=17 * PADDING, top=12 * PADDING,
-    width=3 * PADDING, height=1.5 * PADDING,
-    text="Size", textcolor=colors["black"],
-    rectcolor=colors["white"], screen=screen, font=RectButtonFont)
-
 back_button = RectButton(
-    left=8.5 * PADDING, top=HEIGHT - 7.5 * PADDING,
+    left=11 * PADDING, top=HEIGHT - 7.5 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="Back", textcolor=colors["black"],
     rectcolor=colors["crimson"], screen=screen, font=RectButtonFont)

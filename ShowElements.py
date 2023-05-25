@@ -36,9 +36,6 @@ class RectButton:
     _font: text font
     """
 
-    # There should be no unnecessary attributes
-    __slots__ = ["_left", "_top", "_width", "_height","_text", "_textcolor", "_rectcolor","_screen", "_font", "rect"]
-
     textcolor = type_check("textcolor", tuple)
     rectcolor = type_check("rectcolor", tuple)
 
@@ -56,6 +53,7 @@ class RectButton:
         self.textcolor = textcolor
         self.rectcolor = rectcolor
 
+
     def __call__(self):
         button_text = self._font.render(self._text, True, self._textcolor)
         button_rect = button_text.get_rect()
@@ -65,3 +63,46 @@ class RectButton:
 
     def color_change(self, color: tuple):
         self.rectcolor = color
+
+class TextField:
+
+    text = type_check("text", str)
+    x = type_check("x", int)
+    y = type_check("y", int)
+    width = type_check("width", int)
+    height = type_check("height", int)
+    font_size = type_check("font_size", int)
+    font_color = type_check("font_color", tuple)
+    background_color = type_check("background_color", tuple)
+
+    def __init__(self, x, y, width, height, font_size=24, font_color=(0, 0, 0), background_color=(255, 255, 255)):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.font_size = font_size
+        self.font_color = font_color
+        self.background_color = background_color
+        self.text = ""
+        self.active = False
+
+    def get_info(self):
+        return {
+            'text': self.text,
+            'x': self.x,
+            'y': self.y,
+            'width': self.width,
+            'height': self.height,
+            'font_size': self.font_size,
+            'font_color': self.font_color,
+            'background_color': self.background_color
+        }
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.background_color, (self.x, self.y, self.width, self.height))
+        font = pygame.font.Font(None, self.font_size)
+        text_surface = font.render(self.text, True, self.font_color)
+        screen.blit(text_surface, (self.x, self.y))
+
+    def set_text(self, text):
+        self.text = text

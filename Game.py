@@ -3,7 +3,6 @@ from pygame.locals import *
 from Algorithms import *
 from Maze import *
 
-
 class Game:
 
     def __init__(self):
@@ -21,27 +20,27 @@ class Game:
         self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1], self.__cell_size, screen,
                              colors)
 
-    def input_field(self):
-        input_box = pygame.Rect(225, 285, 100, 32)
-        color_inactive = pygame.Color(colors["deepskyblue"])
+    def enter_maze_size(self):
+
         color_active = pygame.Color(colors["blue"])
+        color_inactive = pygame.Color(colors["deepskyblue"])
 
         color = color_inactive
-        active = False
-        text = ''
+        ACTIVE = False
+        text = ""
 
-        instruction_font = pygame.font.SysFont("timesnewroman", 24)
-        instruction_text = instruction_font.render("Enter size of the maze (f.e. 30): ", True, (colors["black"]))
-        instruction_text_rect = instruction_text.get_rect(center=(WIDTH // 2, 250))
+        Instruction_text = Instruction_font.render("Enter size of the maze (f.e. 30): ", True, (colors["black"]))
+        Instruction_text_rect = Instruction_text.get_rect(center=(WIDTH // 2, 275))
 
-        ps_text_font = pygame.font.SysFont("timesnewroman", 20)
-        ps_text = ps_text_font.render("Warning, the input number must be lower or equal to 50!!!", True,
-                                      colors["crimson"])
-        ps_text_rect = ps_text.get_rect(bottomleft=(10, HEIGHT - 10))
+        Warning_text = RectButtonFont.render("Warning, the input number must be higher or equal to 10 and lower or "
+                                             "equal to 50!!!", True,colors["crimson"])
+        Warning_text_rect = Warning_text.get_rect(bottomleft=(10, HEIGHT - 10))
 
         cursor_color = pygame.Color("black")
         cursor_visible = True
         cursor_timer = 0
+
+        import time
 
         while True:
             for event in pygame.event.get():
@@ -49,16 +48,20 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 if event.type == MOUSEBUTTONDOWN:
-                    if input_box.collidepoint(event.pos):
-                        active = not active
+                    if input_line.collidepoint(event.pos):
+                        ACTIVE = not ACTIVE
                     else:
-                        active = False
-                    color = color_active if active else color_inactive
+                        ACTIVE = False
+                    color = color_active if ACTIVE else color_inactive
                     if back_button.rect.collidepoint(event.pos):
                         return
                 if event.type == KEYDOWN:
-                    if active:
+                    if ACTIVE:
                         if event.key == K_RETURN:
+                            if not text.isdigit():
+                                print("Please enter a valid size (numeric value, e.g., 30)")
+                                time.sleep(self.__TIME)
+                                continue
                             return int(text)
                         elif event.key == K_BACKSPACE:
                             text = text[:-1]
@@ -66,26 +69,28 @@ class Game:
                             text += event.unicode
 
             screen.fill((colors["gainsboro"]))
+
             txt_surface = RectButtonFont.render(text, True, colors["black"])
             width = max(200, txt_surface.get_width() + 10)
-            input_box.w = width
+            input_line.w = width
 
-            screen.blit(instruction_text, instruction_text_rect)
-            screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
-            pygame.draw.rect(screen, color, input_box, 2)
-            screen.blit(ps_text, ps_text_rect)
+            screen.blit(Instruction_text, Instruction_text_rect)
+            screen.blit(txt_surface, (input_line.x + 5, input_line.y + 5))
+            pygame.draw.rect(screen, color, input_line, 2)
+            screen.blit(Warning_text, Warning_text_rect)
 
-            # Мигающий курсор
-            if active:
+            # Cursor
+            if ACTIVE:
                 cursor_timer += CLOCK.get_time()
                 if cursor_timer >= 500:
                     cursor_visible = not cursor_visible
                     cursor_timer = 0
 
-            if cursor_visible and active:
-                cursor_pos = (input_box.x + txt_surface.get_width() + 10, input_box.y + 10)
+            if cursor_visible and ACTIVE:
+                cursor_pos = (input_line.x + txt_surface.get_width() + 10, input_line.y + 10)
                 pygame.draw.line(screen, cursor_color, cursor_pos,
-                                 (cursor_pos[0], cursor_pos[1] + input_box.height - 20), 2)
+                                 (cursor_pos[0], cursor_pos[1] + input_line.height - 20), 2)
+
             back_button()
             pygame.display.flip()
             CLOCK.tick(FPS)
@@ -105,15 +110,16 @@ class Game:
                 # to draw or erase walls in maze.
                 cells = self.__board.draw_board()
 
-                # Drawing buttons
+                # Drawing control buttons
                 start_button()
+                maze_button()
+                maze_size_button()
                 draw_button()
                 erase_button()
-                maze_button()
                 reset_button()
-                maze_size_button()
 
                 # Drawing an algorithms buttons
+                text_field.draw(screen)
                 dijkstra_button()
                 astar_man_button()
                 astar_evk_button()
@@ -142,56 +148,15 @@ class Game:
                             self.__DRAW = False
                             self.__ERASE = False
 
+                            start_button.color_change(colors["yellow"])
                             draw_button.color_change(colors["white"])
                             erase_button.color_change(colors["white"])
-                            start_button.color_change(colors["yellow"])
 
                             start_button()
                             draw_button()
                             erase_button()
 
                             time.sleep(self.__TIME)
-
-                    # DRAW-Button
-                    elif draw_button.rect.collidepoint(mouse):
-                        if not self.__DRAW:
-                            self.__DRAW = True
-                            self.__ERASE = False
-                            draw_button.color_change(colors["yellow"])
-                            erase_button.color_change(colors["white"])
-                        else:
-                            self.__DRAW = False
-                            draw_button.color_change(colors["white"])
-
-                        time.sleep(self.__TIME)
-
-                    # ERASE-Button
-                    elif erase_button.rect.collidepoint(mouse):
-                        if not self.__ERASE:
-                            self.__ERASE = True
-                            self.__DRAW = False
-                            erase_button.color_change(colors["yellow"])
-                            draw_button.color_change(colors["white"])
-                        else:
-                            self.__ERASE = False
-                            erase_button.color_change(colors["white"])
-
-                        time.sleep(self.__TIME)
-
-                    # RESET-Button
-                    elif reset_button.rect.collidepoint(mouse):
-                        self.__DRAW = False
-                        self.__ERASE = False
-                        self.__RESET = True
-
-                        draw_button.color_change(colors["white"])
-                        erase_button.color_change(colors["white"])
-                        reset_button.color_change(colors["yellow"])
-
-                        reset_button()
-                        self.__board.reset()
-
-                        time.sleep(self.__TIME)
 
                     # MAZE-Button
                     elif maze_button.rect.collidepoint(mouse):
@@ -214,9 +179,10 @@ class Game:
 
                         self.__DRAW = False
                         self.__ERASE = False
+
+                        maze_button.color_change(colors["yellow"])
                         draw_button.color_change(colors["white"])
                         erase_button.color_change(colors["white"])
-                        maze_button.color_change(colors["yellow"])
 
                         maze_button()
 
@@ -231,7 +197,6 @@ class Game:
 
                     # SIZE-Button
                     elif maze_size_button.rect.collidepoint(mouse):
-
                         if self.__board.wall:
                             print("Please press RESET(button) to reset the Board")
                             time.sleep(self.__TIME)
@@ -239,21 +204,21 @@ class Game:
 
                         self.__DRAW = False
                         self.__ERASE = False
-                        draw_button.color_change(colors["white"])
-                        erase_button.color_change(colors["white"])
-                        maze_button.color_change(colors["white"])
+
                         maze_button.color_change(colors["white"])
                         maze_size_button.color_change(colors["yellow"])
+                        draw_button.color_change(colors["white"])
+                        erase_button.color_change(colors["white"])
 
-                        new_size = self.input_field()
+                        new_size = self.enter_maze_size()
 
                         if new_size is None:
-                            # User canceled the input, handle it accordingly
+                            # If user canceled the input, handle it accordingly
                             maze_size_button.color_change(colors["white"])
                             continue
 
-                        if new_size > 50:
-                            print("Please enter a size less than or equal to 50")
+                        if new_size < 10 or new_size > 50:
+                            print("Please enter a size higher or equal 10 and less than or equal to 50")
                             time.sleep(self.__TIME)
                             continue
 
@@ -265,6 +230,49 @@ class Game:
                                              self.__cell_size, screen,
                                              colors)
                         cells = self.__board.draw_board()
+
+                        time.sleep(self.__TIME)
+
+                    # DRAW-Button
+                    elif draw_button.rect.collidepoint(mouse):
+                        if not self.__DRAW:
+                            self.__DRAW = True
+                            self.__ERASE = False
+
+                            draw_button.color_change(colors["yellow"])
+                            erase_button.color_change(colors["white"])
+                        else:
+                            self.__DRAW = False
+                            draw_button.color_change(colors["white"])
+
+                        time.sleep(self.__TIME)
+
+                    # ERASE-Button
+                    elif erase_button.rect.collidepoint(mouse):
+                        if not self.__ERASE:
+                            self.__ERASE = True
+                            self.__DRAW = False
+
+                            erase_button.color_change(colors["yellow"])
+                            draw_button.color_change(colors["white"])
+                        else:
+                            self.__ERASE = False
+                            erase_button.color_change(colors["white"])
+
+                        time.sleep(self.__TIME)
+
+                    # RESET-Button
+                    elif reset_button.rect.collidepoint(mouse):
+                        self.__DRAW = False
+                        self.__ERASE = False
+                        self.__RESET = True
+
+                        draw_button.color_change(colors["white"])
+                        erase_button.color_change(colors["white"])
+                        reset_button.color_change(colors["yellow"])
+
+                        reset_button()
+                        self.__board.reset()
 
                         time.sleep(self.__TIME)
 
@@ -357,7 +365,6 @@ class Game:
                                         self.__board.target = None
 
                     time.sleep(self.__TIME)
-
                 pygame.display.flip()
 
             # Start Search
@@ -368,7 +375,6 @@ class Game:
                     self.__SEARCH = False
                     start_button.color_change(colors["green"])
                     continue
-
                 # IF ALGO is None
                 elif self.__ALGO is None:
                     print("Please choose algorithm")
@@ -399,28 +405,37 @@ class Game:
                 if algorithm.find:
                     algorithm.output()
 
-                    # Write the results to the file
+                    # Write positive results to the file
                     result_file.write("\nPath Found!\n")
                     result_file.write("Algorithm used: " + self.__ALGO + "\n")
 
                     state = self.__board.get_board_state()
-                    result_file.write("1)Start: " + str(state["start"]) + "\n")
-                    result_file.write("2)Target: " + str(state["target"]) + "\n")
-                    result_file.write("3)Path: " + str(state["path"]) + "\n")
+                    result_file.write("1) Start: " + str(state["start"]) + "\n")
+                    result_file.write("2) Target: " + str(state["target"]) + "\n")
+                    result_file.write("3) Path: " + str(state["path"]) + "\n")
 
+                    algorithm_info = algorithm.get_info()
+
+                    formatted_info = " - Iterations: " + str(algorithm_info["iterations"]) + "\n"
+                    formatted_info += " - Comparisons: " + str(algorithm_info["comparisons"]) + "\n"
+                    formatted_info += " - Visited Nodes: " + str(algorithm_info["visited_cells"]) + "\n"
+                    formatted_info += " - Time: " + str(algorithm_info["execution_time"]) + "\n"
+                    # Clearing
+                    text_field.set_text("")
+                    # Displaying text
+                    text_field.set_text(formatted_info)
+                    text_field.draw(screen)
                 else:
                     print("Hmm, there is no solution..")
 
-                    # Write the results to the file
+                    # Write negative results to the file
                     result_file.write("\nPath not Found!\n")
                     result_file.write("Algorithm used: " + self.__ALGO + "\n")
 
-                # RESTART
+                # RESTART program
                 self.__SEARCH = False
                 start_button.color_change(colors["green"])
-
         # Close File
         result_file.close()
-
     # FPS
     CLOCK.tick(FPS)

@@ -11,19 +11,24 @@ class Search(metaclass=ABCMeta):
         self._INF = float('inf')
         self._TIME = 0.01
         self._DISTANCE = 1
+        self.visited_cells = 0
+        self.comparisons = 0
+        self.swaps = 0
+        self.execution_time = 0
+
 
     @abstractmethod
     def finding_path(self):
         # Method finding the shortest path
         pass
 
+    @abstractmethod
     def make_info(self):
         # Method making info for algorithms
         pass
 
     def output(self):
         # Method drawing path
-        #
         cells = self.board.draw_board()
 
         # The shortest path, then reverse
@@ -42,11 +47,19 @@ class Search(metaclass=ABCMeta):
             pygame.draw.rect(self.board.screen, color, rect)
             pygame.display.flip()
 
+    def get_info(self):
+        return {
+            'iterations': self.swaps,
+            'comparisons': self.comparisons,
+            'visited_cells': self.visited_cells,
+            'execution_time': self.execution_time
+        }
+
 
 class Dijkstra(Search):
 
     def __init__(self, board: Board):
-        super().__init__()  # Call the parent class constructor
+        super().__init__()
         self.board = board
         self.find = False
 
@@ -75,6 +88,7 @@ class Dijkstra(Search):
 
                 self.node_dict[pos] = node
                 self.distance[node] = self._INF
+                self.visited_cells += 1
 
         self.distance[self.start_node] = 0
 
@@ -94,6 +108,7 @@ class Dijkstra(Search):
         Updates the distance dictionary for each node and enqueues the node based on distance.
         """
         if self.distance[neighbor] > self.distance[node] + self.adj_list[node][neighbor][1]:
+            self.comparisons += 1
             # Update the distance
             self.distance[neighbor] = self.distance[node] + self.adj_list[node][neighbor][1]
 
@@ -102,6 +117,7 @@ class Dijkstra(Search):
             neighbor.action = self.adj_list[node][neighbor][0]
 
             # Add the neighbor to the queue
+            self.swaps += 1
             self.entry_count += 1
             heapq.heappush(self.heap, (self.distance[neighbor], self.entry_count, neighbor))
 
@@ -112,6 +128,7 @@ class Dijkstra(Search):
 
         self.heap = []
         self.entry_count = 1
+        start_time = time.time()
         heapq.heappush(self.heap, (self.distance[self.start_node], self.entry_count, self.start_node))
 
         while self.heap and not self.find:
@@ -136,12 +153,14 @@ class Dijkstra(Search):
                 if neighbor not in self.board.visited:
                     self.update_distance_and_enqueue(node, neighbor)
 
+            end_time = time.time()
+            execution_time = end_time - start_time
             pygame.display.flip()
 
 
 class AStarManhattan(Search):
     def __init__(self, board: Board):
-        super().__init__()  # Call the parent class constructor
+        super().__init__()
         self.board = board
         self.find = False
 
@@ -171,6 +190,7 @@ class AStarManhattan(Search):
 
                 self.node_dict[pos] = node
                 self.g_scores[node] = self._INF
+                self.visited_cells += 1
                 self.h_scores[node] = 0
 
         self.g_scores[self.start_node] = 0
@@ -187,9 +207,11 @@ class AStarManhattan(Search):
         Updates the g-scores for each node and enqueues the neighbor node based on the g-scores and h-scores.
         """
         if self.g_scores[neighbor] > self.g_scores[node] + self.adj_list[node][neighbor][1]:
+            self.comparisons += 1
             self.g_scores[neighbor] = self.g_scores[node] + self.adj_list[node][neighbor][1]
             neighbor.parent = node
             neighbor.action = self.adj_list[node][neighbor][0]
+            self.swaps += 1
             self.entry_count += 1
             self.h_scores[neighbor] = AStarManhattan.manhattan(neighbor, self.target_node)
             heapq.heappush(self.heap, (self.g_scores[neighbor] + self.h_scores[neighbor], self.entry_count, neighbor))
@@ -209,6 +231,7 @@ class AStarManhattan(Search):
         """
         self.heap = []
         self.entry_count = 1
+        start_time = time.time()
         h_score_s2t = AStarManhattan.manhattan(self.start_node, self.target_node)
         heapq.heappush(self.heap, (h_score_s2t, self.entry_count, self.start_node))
 
@@ -229,6 +252,8 @@ class AStarManhattan(Search):
                 if neighbor not in self.board.visited:
                     self.update_distance_and_enqueue(node, neighbor)
 
+            end_time = time.time()  # End time measurement
+            execution_time = end_time - start_time
             pygame.display.flip()
 
 
@@ -264,6 +289,7 @@ class AStarEuclidean(Search):
 
                 self.node_dict[pos] = node
                 self.g_scores[node] = self._INF
+                self.visited_cells += 1
                 self.h_scores[node] = 0
 
         self.g_scores[self.start_node] = 0
@@ -280,9 +306,11 @@ class AStarEuclidean(Search):
         Updates the g-scores for each node and enqueues the neighbor node based on the g-scores and h-scores.
         """
         if self.g_scores[neighbor] > self.g_scores[node] + self.adj_list[node][neighbor][1]:
+            self.comparisons += 1
             self.g_scores[neighbor] = self.g_scores[node] + self.adj_list[node][neighbor][1]
             neighbor.parent = node
             neighbor.action = self.adj_list[node][neighbor][0]
+            self.swaps += 1
             self.entry_count += 1
             self.h_scores[neighbor] = AStarEuclidean.euclidean(neighbor, self.target_node)
             heapq.heappush(self.heap, (self.g_scores[neighbor] + self.h_scores[neighbor], self.entry_count, neighbor))
@@ -303,7 +331,7 @@ class AStarEuclidean(Search):
         """
         self.heap = []
         self.entry_count = 1
-
+        start_time = time.time()
         h_score_s2t = AStarEuclidean.euclidean(self.start_node, self.target_node)
         heapq.heappush(self.heap, (h_score_s2t, self.entry_count, self.start_node))
 
@@ -324,4 +352,6 @@ class AStarEuclidean(Search):
                 if neighbor not in self.board.visited:
                     self.update_distance_and_enqueue(node, neighbor)
 
+            end_time = time.time()
+            execution_time = end_time - start_time
             pygame.display.flip()
