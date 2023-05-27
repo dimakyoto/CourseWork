@@ -1,8 +1,0 @@
-
-Path Found!
-Algorithm used: Dijkstra
-1) Start: (1, 8)
-2) Target: (9, 2)
-3) Path: [(2, 8), (3, 8), (4, 8), (5, 8), (6, 8), (7, 8), (8, 8), (9, 8), (9, 7), (9, 6), (9, 5), (9, 4), (9, 3), (9, 2)]
-RESET pressed
-RESET pressed

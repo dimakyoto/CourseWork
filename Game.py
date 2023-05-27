@@ -31,8 +31,8 @@ class Game:
         Instruction_text = Instruction_font.render("Enter size of the maze (e.g., 30): ", True, colors["black"])
         Instruction_text_rect = Instruction_text.get_rect(center=(WIDTH // 2, 275))
 
-        Warning_text = RectButtonFont.render("Warning: The input number must be between 10 and 50!", True,
-                                             colors["crimson"])
+        Warning_text = ButtonFont.render("Warning: The input number must be between 10 and 50!", True,
+                                         colors["crimson"])
         Warning_text_rect = Warning_text.get_rect(bottomleft=(10, HEIGHT - 10))
 
         cursor_color = pygame.Color("black")
@@ -72,8 +72,8 @@ class Game:
 
             screen.fill(colors["gainsboro"])
 
-            txt_surface = RectButtonFont.render(text, True, colors["black"])
-            width = max(200, txt_surface.get_width() + 10, MAX_LENGTH * RectButtonFont.size(" ")[0])
+            txt_surface = ButtonFont.render(text, True, colors["black"])
+            width = max(200, txt_surface.get_width() + 10, MAX_LENGTH * ButtonFont.size(" ")[0])
             input_line.w = width
 
             screen.blit(Instruction_text, Instruction_text_rect)
