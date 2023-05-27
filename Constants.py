@@ -36,6 +36,8 @@ Execution_time = TextField(x=520, y=143, width=250, height=37.5)
 # Input line for size changing
 input_line = pygame.Rect(300, 300, 100, 32)
 
+MAX_LENGTH = 15
+
 # Color dictionary
 colors = {
     "black": (0, 0, 0),  # background

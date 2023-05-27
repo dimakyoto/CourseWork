@@ -21,7 +21,6 @@ class Game:
                              colors)
 
     def enter_maze_size(self):
-
         color_active = pygame.Color(colors["blue"])
         color_inactive = pygame.Color(colors["deepskyblue"])
 
@@ -29,18 +28,16 @@ class Game:
         ACTIVE = False
         text = ""
 
-        Instruction_text = Instruction_font.render("Enter size of the maze (f.e. 30): ", True, (colors["black"]))
+        Instruction_text = Instruction_font.render("Enter size of the maze (e.g., 30): ", True, colors["black"])
         Instruction_text_rect = Instruction_text.get_rect(center=(WIDTH // 2, 275))
 
-        Warning_text = RectButtonFont.render("Warning, the input number must be higher or equal to 10 and lower or "
-                                             "equal to 50!!!", True,colors["crimson"])
+        Warning_text = RectButtonFont.render("Warning: The input number must be between 10 and 50!", True,
+                                             colors["crimson"])
         Warning_text_rect = Warning_text.get_rect(bottomleft=(10, HEIGHT - 10))
 
         cursor_color = pygame.Color("black")
         cursor_visible = True
         cursor_timer = 0
-
-        import time
 
         while True:
             for event in pygame.event.get():
@@ -60,18 +57,23 @@ class Game:
                         if event.key == K_RETURN:
                             if not text.isdigit():
                                 print("Please enter a valid size (numeric value, e.g., 30)")
-                                time.sleep(self.__TIME)
-                                continue
-                            return int(text)
+                            else:
+                                size = int(text)
+                                if size < 10 or size > 50:
+                                    print("Size must be between 10 and 50")
+                                else:
+                                    return size
                         elif event.key == K_BACKSPACE:
                             text = text[:-1]
                         else:
                             text += event.unicode
+                            if len(text) > MAX_LENGTH:
+                                text = text[:MAX_LENGTH]
 
-            screen.fill((colors["gainsboro"]))
+            screen.fill(colors["gainsboro"])
 
             txt_surface = RectButtonFont.render(text, True, colors["black"])
-            width = max(200, txt_surface.get_width() + 10)
+            width = max(200, txt_surface.get_width() + 10, MAX_LENGTH * RectButtonFont.size(" ")[0])
             input_line.w = width
 
             screen.blit(Instruction_text, Instruction_text_rect)
@@ -133,6 +135,16 @@ class Game:
                     reset_button.color_change(colors["crimson"])
                     reset_button()
                     self.__RESET = False
+                    self.__ALGO = None  # Сброс выбранного алгоритма
+
+                    Comparisons.set_text("")
+                    Comparisons.draw(screen)
+                    Iterations.set_text("")
+                    Iterations.draw(screen)
+                    Visited_cells.set_text("")
+                    Visited_cells.draw(screen)
+                    Execution_time.set_text("")
+                    Execution_time.draw(screen)
 
                     # Writing if RESET pressed to the file
                     result_file.write("RESET pressed\n")
@@ -220,11 +232,6 @@ class Game:
                             maze_size_button.color_change(colors["white"])
                             continue
 
-                        if new_size < 10 or new_size > 50:
-                            print("Please enter a size higher or equal 10 and less than or equal to 50")
-                            time.sleep(self.__TIME)
-                            continue
-
                         maze_size_button.color_change(colors["white"])
 
                         self.__v_cells, self.__h_cells = new_size, new_size
@@ -270,9 +277,16 @@ class Game:
                         self.__ERASE = False
                         self.__RESET = True
 
+                        start_button.color_change(colors["green"])
+                        maze_button.color_change(colors["white"])
+                        maze_size_button.color_change(colors["white"])
                         draw_button.color_change(colors["white"])
                         erase_button.color_change(colors["white"])
                         reset_button.color_change(colors["yellow"])
+
+                        dijkstra_button.color_change(colors["white"])
+                        astar_man_button.color_change(colors["white"])
+                        astar_evk_button.color_change(colors["white"])
 
                         reset_button()
                         self.__board.reset()
