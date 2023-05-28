@@ -14,10 +14,27 @@ class Game:
         self.__ALGO = None
         self.__PRESS = False
         self.__TIME = 0.1
+
         self.__v_cells = 50
         self.__h_cells = 50
         self.__cell_size = int(min(board_height / self.__v_cells, board_width / self.__h_cells))
+
         self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1], self.__cell_size, screen)
+
+    def reset_algorithms_colors(self):
+        astar_man_button.color_change(colors["white"])
+        dijkstra_button.color_change(colors["white"])
+        astar_evk_button.color_change(colors["white"])
+
+    def reset_textfield(self):
+        Comparisons.set_text("")
+        Comparisons.draw(screen)
+        Iterations.set_text("")
+        Iterations.draw(screen)
+        Visited_cells.set_text("")
+        Visited_cells.draw(screen)
+        Execution_time.set_text("")
+        Execution_time.draw(screen)
 
     def enter_maze_size(self):
         color_active = pygame.Color(colors["blue"])
@@ -80,7 +97,6 @@ class Game:
             pygame.draw.rect(screen, color, input_line, 2)
             screen.blit(Warning_text, Warning_text_rect)
 
-            # Cursor
             if ACTIVE:
                 cursor_timer += CLOCK.get_time()
                 if cursor_timer >= 500:
@@ -103,12 +119,10 @@ class Game:
                 if event.type == pygame.QUIT:
                     sys.exit()
 
-            # Background filling
             screen.fill(colors["black"])
 
             if not self.__SEARCH:
-                # Drawing a board and coordinates of cells,
-                # to draw or erase walls in maze.
+
                 cells = self.__board.draw_board()
 
                 # Drawing control buttons
@@ -134,18 +148,10 @@ class Game:
                     reset_button.color_change(colors["crimson"])
                     reset_button()
                     self.__RESET = False
-                    self.__ALGO = None  # Сброс выбранного алгоритма
+                    self.__ALGO = None
 
-                    Comparisons.set_text("")
-                    Comparisons.draw(screen)
-                    Iterations.set_text("")
-                    Iterations.draw(screen)
-                    Visited_cells.set_text("")
-                    Visited_cells.draw(screen)
-                    Execution_time.set_text("")
-                    Execution_time.draw(screen)
+                    self.reset_textfield()
 
-                    # Writing if RESET pressed to the file
                     result_file.write("RESET pressed\n")
 
                 # Mouse-buttons pressed
@@ -167,8 +173,6 @@ class Game:
                             erase_button.color_change(colors["white"])
 
                             start_button()
-                            draw_button()
-                            erase_button()
 
                             time.sleep(self.__TIME)
 
@@ -227,7 +231,6 @@ class Game:
                         new_size = self.enter_maze_size()
 
                         if new_size is None:
-                            # If user canceled the input, handle it accordingly
                             maze_size_button.color_change(colors["white"])
                             continue
 
@@ -282,9 +285,7 @@ class Game:
                         erase_button.color_change(colors["white"])
                         reset_button.color_change(colors["yellow"])
 
-                        dijkstra_button.color_change(colors["white"])
-                        astar_man_button.color_change(colors["white"])
-                        astar_evk_button.color_change(colors["white"])
+                        self.reset_algorithms_colors()
 
                         reset_button()
                         self.__board.reset()
@@ -303,9 +304,7 @@ class Game:
                             time.sleep(self.__TIME)
                         else:
                             self.__ALGO = None
-                            dijkstra_button.color_change(colors["white"])
-                            astar_man_button.color_change(colors["white"])
-                            astar_evk_button.color_change(colors["white"])
+                            self.reset_algorithms_colors()
 
                             time.sleep(self.__TIME)
 
@@ -321,9 +320,7 @@ class Game:
                             time.sleep(self.__TIME)
                         else:
                             self.__ALGO = None
-                            astar_man_button.color_change(colors["white"])
-                            dijkstra_button.color_change(colors["white"])
-                            astar_evk_button.color_change(colors["white"])
+                            self.reset_algorithms_colors()
 
                             time.sleep(self.__TIME)
 
@@ -339,9 +336,7 @@ class Game:
                             time.sleep(self.__TIME)
                         else:
                             self.__ALGO = None
-                            astar_evk_button.color_change(colors["white"])
-                            astar_man_button.color_change(colors["white"])
-                            dijkstra_button.color_change(colors["white"])
+                            self.reset_algorithms_colors()
 
                             time.sleep(self.__TIME)
 
@@ -365,17 +360,13 @@ class Game:
                             if i < self.__v_cells and j < self.__h_cells:
                                 cell = cells[i][j]
                                 if cell.collidepoint(mouse):
-                                    # if it's not wall and start has not been created, create start
                                     if (i, j) not in self.__board.wall and self.__board.start is None:
                                         self.__board.start = (i, j)
-                                    # if it's not wall and start, and target has not been created, create target
                                     elif (i, j) not in self.__board.wall and (
                                             i, j) != self.__board.start and self.__board.target is None:
                                         self.__board.target = (i, j)
-                                    # if it's start and target has not been created, chancel start
                                     elif (i, j) == self.__board.start and self.__board.target is None:
                                         self.__board.start = None
-                                    # if it's target, chancel target
                                     elif (i, j) == self.__board.target:
                                         self.__board.target = None
 
@@ -384,13 +375,11 @@ class Game:
 
             # Start Search
             else:
-                # If START and FINISH is None
                 if self.__board.start is None or self.__board.target is None:
                     print("Please choose position of START(target) and FINISH(target) to search")
                     self.__SEARCH = False
                     start_button.color_change(colors["green"])
                     continue
-                # IF ALGO is None
                 elif self.__ALGO is None:
                     print("Please choose algorithm")
                     self.__SEARCH = False
@@ -420,7 +409,6 @@ class Game:
                 if algorithm.find:
                     algorithm.output()
 
-                    # Write positive results to the file
                     result_file.write("\nPath Found!\n")
                     result_file.write("Algorithm used: " + self.__ALGO + "\n")
 
@@ -454,7 +442,6 @@ class Game:
                 else:
                     print("Hmm, there is no solution..")
 
-                    # Write negative results to the file
                     result_file.write("\nPath not Found!\n")
                     result_file.write("Algorithm used: " + self.__ALGO + "\n")
 
@@ -480,10 +467,7 @@ class Game:
                     Execution_time.set_text(Execution_time_info)
                     Execution_time.draw(screen)
 
-                # RESTART program
                 self.__SEARCH = False
                 start_button.color_change(colors["green"])
-        # Close File
         result_file.close()
-    # FPS
     CLOCK.tick(FPS)
