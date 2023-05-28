@@ -17,8 +17,7 @@ class Game:
         self.__v_cells = 50
         self.__h_cells = 50
         self.__cell_size = int(min(board_height / self.__v_cells, board_width / self.__h_cells))
-        self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1], self.__cell_size, screen,
-                             colors)
+        self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1], self.__cell_size, screen)
 
     def enter_maze_size(self):
         color_active = pygame.Color(colors["blue"])
@@ -237,8 +236,7 @@ class Game:
                         self.__v_cells, self.__h_cells = new_size, new_size
                         self.__cell_size = int(min(board_height / self.__v_cells, board_width / self.__h_cells))
                         self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1],
-                                             self.__cell_size, screen,
-                                             colors)
+                                             self.__cell_size, screen)
                         cells = self.__board.draw_board()
 
                         time.sleep(self.__TIME)

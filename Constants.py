@@ -1,6 +1,5 @@
 from InterfaceElements import *
 
-pygame.init()
 
 # Screen size
 WIDTH, HEIGHT = 800, 600
@@ -26,15 +25,6 @@ board_height = HEIGHT - 3.5 * PADDING
 board_width = WIDTH - 3.5 * PADDING
 board_start = (PADDING, PADDING)
 
-# TextFields complexity results
-Comparisons = TextField(x=520, y=32, width=250, height=37.5)
-Iterations = TextField(x=520, y=69, width=250, height=37.5)
-Visited_cells = TextField(x=520, y=106, width=250, height=37.5)
-Execution_time = TextField(x=520, y=143, width=250, height=37.5)
-
-# Input line for size changing
-input_line = pygame.Rect(300, 300, 100, 32)
-
 # Max length of input new maze size
 MAX_LENGTH = 15
 
@@ -55,6 +45,15 @@ colors = {
     "deepskyblue": (0, 191, 255),  # inactive
     "gainsboro": (220, 220, 220),  # maze size interface filling
 }
+
+# TextFields complexity results
+Comparisons = TextField(x=520, y=32, width=250, height=37.5)
+Iterations = TextField(x=520, y=69, width=250, height=37.5)
+Visited_cells = TextField(x=520, y=106, width=250, height=37.5)
+Execution_time = TextField(x=520, y=143, width=250, height=37.5)
+
+# Input line for size changing
+input_line = pygame.Rect(300, 300, 100, 32)
 
 # Buttons
 start_button = Button(

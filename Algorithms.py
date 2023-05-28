@@ -1,8 +1,39 @@
-import time
 import heapq
-from Environment import *
+from Maze import *
 from collections import defaultdict
 from abc import ABCMeta, abstractmethod
+
+class Node:
+    """
+    The Node class is used to create node objects that store the node's coordinates, its parent, and the action that led to this node.
+
+    This class allows representing nodes of a graph while preserving information about their relationships
+    and the actions associated with moving between nodes.
+
+    state: position standing --> tuple
+    action: action taken to move --> str
+    parent: parent of the node --> Node
+    """
+    def __init__(self, state: tuple, action: str, parent=None):
+        self.state = state
+        self.parent = parent
+        self.action = action
+
+    def __repr__(self):
+        if self.parent is None:
+            fmt = "Node {} and no Parent".format(self.state)
+        else:
+            fmt = "Node {} with Parent {}".format(self.state, self.parent.state)
+        return fmt
+
+    def __eq__(self, other):
+        if isinstance(other, Node):
+            return self.state == other.state
+        else:
+            return False
+
+    def __hash__(self):
+        return hash(self.state)
 
 
 class Search(metaclass=ABCMeta):
@@ -41,7 +72,7 @@ class Search(metaclass=ABCMeta):
         self.board.path.reverse()
 
         # Drawing path
-        color = self.board.colors["gold"]
+        color = colors["gold"]
 
         for i, j in self.board.path:
             time.sleep(1.5 * self._TIME)
