@@ -27,14 +27,37 @@ class Game:
         astar_evk_button.color_change(colors["white"])
 
     def reset_textfield(self):
-        Comparisons.set_text("")
-        Comparisons.draw(screen)
-        Iterations.set_text("")
-        Iterations.draw(screen)
-        Visited_cells.set_text("")
-        Visited_cells.draw(screen)
-        Execution_time.set_text("")
-        Execution_time.draw(screen)
+        text_fields = [Comparisons, Iterations, Visited_cells, Execution_time]
+        for field in text_fields:
+            field.set_text("")
+            field.draw(screen)
+
+    def complexity_res(self, algorithm_info):
+        labels = {
+            "comparisons": Comparisons,
+            "iterations": Iterations,
+            "visited_cells": Visited_cells,
+            "execution_time": Execution_time
+        }
+
+        for key, value in algorithm_info.items():
+            label = labels.get(key)
+            if label is not None:
+                label_info = f"{key.capitalize()}: {value}"
+                label.set_text("")
+                label.set_text(label_info)
+                label.draw(screen)
+
+    def select_algorithm(self, button, algo_name):
+        if self.__ALGO != algo_name:
+            self.reset_algorithms_colors()
+            self.__ALGO = algo_name
+            button.color_change(colors["yellow"])
+            time.sleep(self.__TIME)
+        else:
+            self.__ALGO = None
+            self.reset_algorithms_colors()
+            time.sleep(self.__TIME)
 
     def enter_maze_size(self):
         color_active = pygame.Color(colors["blue"])
@@ -240,7 +263,6 @@ class Game:
                         self.__cell_size = int(min(board_height / self.__v_cells, board_width / self.__h_cells))
                         self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1],
                                              self.__cell_size, screen)
-                        cells = self.__board.draw_board()
 
                         time.sleep(self.__TIME)
 
@@ -293,52 +315,16 @@ class Game:
                         time.sleep(self.__TIME)
 
                     # Choosing Algorithm, Dijkstra
-                    if dijkstra_button.rect.collidepoint(mouse):
-                        if self.__ALGO != "Dijkstra":
-                            self.__ALGO = "Dijkstra"
-
-                            dijkstra_button.color_change(colors["yellow"])
-                            astar_man_button.color_change(colors["white"])
-                            astar_evk_button.color_change(colors["white"])
-
-                            time.sleep(self.__TIME)
-                        else:
-                            self.__ALGO = None
-                            self.reset_algorithms_colors()
-
-                            time.sleep(self.__TIME)
+                    elif dijkstra_button.rect.collidepoint(mouse):
+                        self.select_algorithm(dijkstra_button, "Dijkstra")
 
                     # А* Manhattan
                     elif astar_man_button.rect.collidepoint(mouse):
-                        if self.__ALGO != "AStarManhattan":
-                            self.__ALGO = "AStarManhattan"
-
-                            astar_man_button.color_change(colors["yellow"])
-                            dijkstra_button.color_change(colors["white"])
-                            astar_evk_button.color_change(colors["white"])
-
-                            time.sleep(self.__TIME)
-                        else:
-                            self.__ALGO = None
-                            self.reset_algorithms_colors()
-
-                            time.sleep(self.__TIME)
+                        self.select_algorithm(astar_man_button, "AStarManhattan")
 
                     # А* Euclidean
                     elif astar_evk_button.rect.collidepoint(mouse):
-                        if self.__ALGO != "AStarEuclidean":
-                            self.__ALGO = "AStarEuclidean"
-
-                            astar_evk_button.color_change(colors["yellow"])
-                            astar_man_button.color_change(colors["white"])
-                            dijkstra_button.color_change(colors["white"])
-
-                            time.sleep(self.__TIME)
-                        else:
-                            self.__ALGO = None
-                            self.reset_algorithms_colors()
-
-                            time.sleep(self.__TIME)
+                        self.select_algorithm(astar_evk_button, "AStarEuclidean")
 
                     # Drawing and Erasing Logic
                     else:
@@ -410,7 +396,7 @@ class Game:
                     algorithm.output()
 
                     result_file.write("\nPath Found!\n")
-                    result_file.write("Algorithm used: " + self.__ALGO + "\n")
+                    result_file.write("Algorithm used: " + str(self.__ALGO) + "\n")
 
                     state = self.__board.get_board_state()
                     result_file.write("1) Start: " + str(state["start"]) + "\n")
@@ -418,54 +404,16 @@ class Game:
                     result_file.write("3) Path: " + str(state["path"]) + "\n")
 
                     algorithm_info = algorithm.get_info()
-
-                    Comparisons_info = "1)Comparisons: " + str(algorithm_info["comparisons"])
-                    Comparisons.set_text("")
-                    Comparisons.set_text(Comparisons_info)
-                    Comparisons.draw(screen)
-
-                    Iterations_info = "2)Iterations: " + str(algorithm_info["iterations"])
-                    Iterations.set_text("")
-                    Iterations.set_text(Iterations_info)
-                    Iterations.draw(screen)
-
-                    Visited_cells_info = "3)Visited Nodes: " + str(algorithm_info["visited_cells"])
-                    Visited_cells.set_text("")
-                    Visited_cells.set_text(Visited_cells_info)
-                    Visited_cells.draw(screen)
-
-                    Execution_time_info = "4)Execution time: " + str(algorithm_info["execution_time"])
-                    Execution_time.set_text("")
-                    Execution_time.set_text(Execution_time_info)
-                    Execution_time.draw(screen)
+                    self.complexity_res(algorithm_info)
 
                 else:
                     print("Hmm, there is no solution..")
 
                     result_file.write("\nPath not Found!\n")
-                    result_file.write("Algorithm used: " + self.__ALGO + "\n")
+                    result_file.write("Algorithm used: " + str(self.__ALGO) + "\n")
 
                     algorithm_info = algorithm.get_info()
-
-                    Comparisons_info = "1)Comparisons: " + str(algorithm_info["comparisons"])
-                    Comparisons.set_text("")
-                    Comparisons.set_text(Comparisons_info)
-                    Comparisons.draw(screen)
-
-                    Iterations_info = "2)Iterations: " + str(algorithm_info["iterations"])
-                    Iterations.set_text("")
-                    Iterations.set_text(Iterations_info)
-                    Iterations.draw(screen)
-
-                    Visited_cells_info = "3)Visited Nodes: " + str(algorithm_info["visited_cells"])
-                    Visited_cells.set_text("")
-                    Visited_cells.set_text(Visited_cells_info)
-                    Visited_cells.draw(screen)
-
-                    Execution_time_info = "4)Execution time: " + str(algorithm_info["execution_time"])
-                    Execution_time.set_text("")
-                    Execution_time.set_text(Execution_time_info)
-                    Execution_time.draw(screen)
+                    self.complexity_res(algorithm_info)
 
                 self.__SEARCH = False
                 start_button.color_change(colors["green"])
