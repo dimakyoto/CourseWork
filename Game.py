@@ -8,8 +8,6 @@ class Game:
     def __init__(self):
         self.__RUNNING = True
         self.__SEARCH = False
-        self.__DRAW = False
-        self.__ERASE = False
         self.__RESET = False
         self.__ALGO = None
         self.__PRESS = False
@@ -20,44 +18,6 @@ class Game:
         self.__cell_size = int(min(board_height / self.__v_cells, board_width / self.__h_cells))
 
         self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1], self.__cell_size, screen)
-
-    def reset_algorithms_colors(self):
-        astar_man_button.color_change(colors["white"])
-        dijkstra_button.color_change(colors["white"])
-        astar_evk_button.color_change(colors["white"])
-
-    def reset_textfield(self):
-        text_fields = [Comparisons, Iterations, Visited_cells, Execution_time]
-        for field in text_fields:
-            field.set_text("")
-            field.draw(screen)
-
-    def complexity_res(self, algorithm_info):
-        labels = {
-            "comparisons": Comparisons,
-            "iterations": Iterations,
-            "visited_cells": Visited_cells,
-            "execution_time": Execution_time
-        }
-
-        for key, value in algorithm_info.items():
-            label = labels.get(key)
-            if label is not None:
-                label_info = f"{key.capitalize()}: {value}"
-                label.set_text("")
-                label.set_text(label_info)
-                label.draw(screen)
-
-    def select_algorithm(self, button, algo_name):
-        if self.__ALGO != algo_name:
-            self.reset_algorithms_colors()
-            self.__ALGO = algo_name
-            button.color_change(colors["yellow"])
-            time.sleep(self.__TIME)
-        else:
-            self.__ALGO = None
-            self.reset_algorithms_colors()
-            time.sleep(self.__TIME)
 
     def enter_maze_size(self):
         color_active = pygame.Color(colors["blue"])
@@ -135,6 +95,67 @@ class Game:
             pygame.display.flip()
             CLOCK.tick(FPS)
 
+    def select_algorithm(self, button, algo_name):
+        if self.__ALGO != algo_name:
+            self.reset_algorithms_colors()
+            self.__ALGO = algo_name
+            button.color_change(colors["yellow"])
+            time.sleep(self.__TIME)
+        else:
+            self.__ALGO = None
+            self.reset_algorithms_colors()
+            time.sleep(self.__TIME)
+    def complexity_res(self, algorithm_info):
+        labels = {
+            "comparisons": Comparisons,
+            "iterations": Iterations,
+            "visited_cells": Visited_cells,
+            "execution_time": Execution_time
+        }
+
+        for key, value in algorithm_info.items():
+            label = labels.get(key)
+            if label is not None:
+                label_info = f"{key.capitalize()}: {value}"
+                label.set_text("")
+                label.set_text(label_info)
+                label.draw(screen)
+    def algorithm_res_output(self, algorithm):
+        if algorithm.find:
+            algorithm.output()
+
+            result_file.write("\nPath Found!\n")
+            result_file.write("Algorithm used: " + str(self.__ALGO) + "\n")
+
+            state = self.__board.get_board_state()
+            result_file.write("1) Start: " + str(state["start"]) + "\n")
+            result_file.write("2) Target: " + str(state["target"]) + "\n")
+            result_file.write("3) Path: " + str(state["path"]) + "\n")
+
+            algorithm_info = algorithm.get_info()
+            self.complexity_res(algorithm_info)
+
+        else:
+            print("Hmm, there is no solution..")
+
+            result_file.write("\nPath not Found!\n")
+            result_file.write("Algorithm used: " + str(self.__ALGO) + "\n")
+
+            algorithm_info = algorithm.get_info()
+            self.complexity_res(algorithm_info)
+
+
+    def reset_algorithms_colors(self):
+        astar_man_button.color_change(colors["white"])
+        dijkstra_button.color_change(colors["white"])
+        astar_evk_button.color_change(colors["white"])
+
+    def reset_textfield(self):
+        text_fields = [Comparisons, Iterations, Visited_cells, Execution_time]
+        for field in text_fields:
+            field.set_text("")
+            field.draw(screen)
+
     def main_loop(self):
         while self.__RUNNING:
             # EXIT
@@ -152,8 +173,6 @@ class Game:
                 start_button()
                 maze_button()
                 maze_size_button()
-                draw_button()
-                erase_button()
                 reset_button()
 
                 # Drawing an algorithms buttons
@@ -188,13 +207,8 @@ class Game:
                     if start_button.rect.collidepoint(mouse):
                         if not self.__SEARCH:
                             self.__SEARCH = True
-                            self.__DRAW = False
-                            self.__ERASE = False
 
                             start_button.color_change(colors["yellow"])
-                            draw_button.color_change(colors["white"])
-                            erase_button.color_change(colors["white"])
-
                             start_button()
 
                             time.sleep(self.__TIME)
@@ -218,13 +232,7 @@ class Game:
                             time.sleep(self.__TIME)
                             continue
 
-                        self.__DRAW = False
-                        self.__ERASE = False
-
                         maze_button.color_change(colors["yellow"])
-                        draw_button.color_change(colors["white"])
-                        erase_button.color_change(colors["white"])
-
                         maze_button()
 
                         maze_creator = Maze(self.__board)
@@ -243,13 +251,8 @@ class Game:
                             time.sleep(self.__TIME)
                             continue
 
-                        self.__DRAW = False
-                        self.__ERASE = False
-
                         maze_button.color_change(colors["white"])
                         maze_size_button.color_change(colors["yellow"])
-                        draw_button.color_change(colors["white"])
-                        erase_button.color_change(colors["white"])
 
                         new_size = self.enter_maze_size()
 
@@ -266,45 +269,13 @@ class Game:
 
                         time.sleep(self.__TIME)
 
-                    # DRAW-Button
-                    elif draw_button.rect.collidepoint(mouse):
-                        if not self.__DRAW:
-                            self.__DRAW = True
-                            self.__ERASE = False
-
-                            draw_button.color_change(colors["yellow"])
-                            erase_button.color_change(colors["white"])
-                        else:
-                            self.__DRAW = False
-                            draw_button.color_change(colors["white"])
-
-                        time.sleep(self.__TIME)
-
-                    # ERASE-Button
-                    elif erase_button.rect.collidepoint(mouse):
-                        if not self.__ERASE:
-                            self.__ERASE = True
-                            self.__DRAW = False
-
-                            erase_button.color_change(colors["yellow"])
-                            draw_button.color_change(colors["white"])
-                        else:
-                            self.__ERASE = False
-                            erase_button.color_change(colors["white"])
-
-                        time.sleep(self.__TIME)
-
                     # RESET-Button
                     elif reset_button.rect.collidepoint(mouse):
-                        self.__DRAW = False
-                        self.__ERASE = False
                         self.__RESET = True
 
                         start_button.color_change(colors["green"])
                         maze_button.color_change(colors["white"])
                         maze_size_button.color_change(colors["white"])
-                        draw_button.color_change(colors["white"])
-                        erase_button.color_change(colors["white"])
                         reset_button.color_change(colors["yellow"])
 
                         self.reset_algorithms_colors()
@@ -325,17 +296,6 @@ class Game:
                     # А* Euclidean
                     elif astar_evk_button.rect.collidepoint(mouse):
                         self.select_algorithm(astar_evk_button, "AStarEuclidean")
-
-                    # Drawing and Erasing Logic
-                    else:
-                        for i in range(self.__v_cells):
-                            for j in range(self.__h_cells):
-                                cell = cells[i][j]
-                                if (i, j) != self.__board.start or (i, j) != self.__board.target:
-                                    if self.__DRAW and cell.collidepoint(mouse):
-                                        self.__board.wall.add((i, j))
-                                    elif self.__ERASE and cell.collidepoint(mouse) and (i, j) in self.__board.wall:
-                                        self.__board.wall.remove((i, j))
 
                 # Right-Button pressed(Erasing targets)
                 elif right == 1:
@@ -391,29 +351,7 @@ class Game:
                     algorithm.make_info()
                     algorithm.finding_path()
 
-                # If PATH found
-                if algorithm.find:
-                    algorithm.output()
-
-                    result_file.write("\nPath Found!\n")
-                    result_file.write("Algorithm used: " + str(self.__ALGO) + "\n")
-
-                    state = self.__board.get_board_state()
-                    result_file.write("1) Start: " + str(state["start"]) + "\n")
-                    result_file.write("2) Target: " + str(state["target"]) + "\n")
-                    result_file.write("3) Path: " + str(state["path"]) + "\n")
-
-                    algorithm_info = algorithm.get_info()
-                    self.complexity_res(algorithm_info)
-
-                else:
-                    print("Hmm, there is no solution..")
-
-                    result_file.write("\nPath not Found!\n")
-                    result_file.write("Algorithm used: " + str(self.__ALGO) + "\n")
-
-                    algorithm_info = algorithm.get_info()
-                    self.complexity_res(algorithm_info)
+                self.algorithm_res_output(algorithm)
 
                 self.__SEARCH = False
                 start_button.color_change(colors["green"])

@@ -1,6 +1,5 @@
 from InterfaceElements import *
 
-
 # Screen size
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -63,31 +62,19 @@ start_button = Button(
     button_color=colors["green"], screen=screen, font=ButtonFont)
 
 maze_button = Button(
-    horizontal=4.5 * PADDING, vertical=HEIGHT - 2 * PADDING,
+    horizontal=4.7 * PADDING, vertical=HEIGHT - 2 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="Maze", textcolor=colors["black"],
     button_color=colors["white"], screen=screen, font=ButtonFont)
 
 maze_size_button = Button(
-    horizontal=8 * PADDING, vertical=HEIGHT - 2 * PADDING,
+    horizontal=8.3 * PADDING, vertical=HEIGHT - 2 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="Size", textcolor=colors["black"],
     button_color=colors["white"], screen=screen, font=ButtonFont)
 
-draw_button = Button(
-    horizontal=11.5 * PADDING, vertical=HEIGHT - 2 * PADDING,
-    width=3 * PADDING, height=1.5 * PADDING,
-    text="Draw Wall", textcolor=colors["black"],
-    button_color=colors["white"], screen=screen, font=ButtonFont)
-
-erase_button = Button(
-    horizontal=15 * PADDING, vertical=HEIGHT - 2 * PADDING,
-    width=3 * PADDING, height=1.5 * PADDING,
-    text="Erase Wall", textcolor=colors["black"],
-    button_color=colors["white"], screen=screen, font=ButtonFont)
-
 reset_button = Button(
-    horizontal=18.5 * PADDING, vertical=HEIGHT - 2 * PADDING,
+    horizontal=12 * PADDING, vertical=HEIGHT - 2 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="Reset", textcolor=colors["black"],
     button_color=colors["crimson"], screen=screen, font=ButtonFont)
