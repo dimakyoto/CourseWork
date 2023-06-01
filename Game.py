@@ -1,5 +1,4 @@
 import sys
-from pygame.locals import *
 from Algorithms import *
 from Maze import *
 
@@ -20,8 +19,8 @@ class Game:
         self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1], self.__cell_size, screen)
 
     def enter_maze_size(self):
-        color_active = pygame.Color(colors["blue"])
-        color_inactive = pygame.Color(colors["deepskyblue"])
+        color_active = pygame.Color("blue")
+        color_inactive = pygame.Color("deepskyblue")
 
         color = color_inactive
         ACTIVE = False
@@ -40,10 +39,10 @@ class Game:
 
         while True:
             for event in pygame.event.get():
-                if event.type == QUIT:
+                if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if event.type == MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONDOWN:
                     if input_line.collidepoint(event.pos):
                         ACTIVE = not ACTIVE
                     else:
@@ -51,9 +50,9 @@ class Game:
                     color = color_active if ACTIVE else color_inactive
                     if back_button.rect.collidepoint(event.pos):
                         return
-                if event.type == KEYDOWN:
+                if event.type == pygame.KEYDOWN:
                     if ACTIVE:
-                        if event.key == K_RETURN:
+                        if event.key == pygame.K_RETURN:
                             if not text.isdigit():
                                 print("Please enter a valid size (numeric value, e.g., 30)")
                             else:
@@ -62,7 +61,7 @@ class Game:
                                     print("Size must be between 10 and 50")
                                 else:
                                     return size
-                        elif event.key == K_BACKSPACE:
+                        elif event.key == pygame.K_BACKSPACE:
                             text = text[:-1]
                         else:
                             text += event.unicode
@@ -105,6 +104,7 @@ class Game:
             self.__ALGO = None
             self.reset_algorithms_colors()
             time.sleep(self.__TIME)
+
     def complexity_res(self, algorithm_info):
         labels = {
             "comparisons": Comparisons,
