@@ -1,7 +1,7 @@
 from InterfaceElements import *
 
 # Screen size
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 850, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # Fonts
@@ -46,10 +46,11 @@ colors = {
 }
 
 # TextFields complexity results
-Comparisons = TextField(x=520, y=32, width=250, height=37.5)
-Iterations = TextField(x=520, y=69, width=250, height=37.5)
-Visited_cells = TextField(x=520, y=106, width=250, height=37.5)
-Execution_time = TextField(x=520, y=143, width=250, height=37.5)
+Comparisons = TextField(x=520, y=32, width=310, height=37.5)
+Iterations = TextField(x=520, y=69, width=310, height=37.5)
+Visited_cells = TextField(x=520, y=106, width=310, height=37.5)
+Execution_time = TextField(x=520, y=143, width=310, height=37.5)
+Error_field = TextField(x=520, y=445, width=310, height=35)
 
 # Input line for size changing
 input_line = pygame.Rect(300, 300, 100, 32)
@@ -80,19 +81,19 @@ reset_button = Button(
     button_color=colors["crimson"], screen=screen, font=ButtonFont)
 
 dijkstra_button = Button(
-    horizontal=18.5 * PADDING, vertical=7 * PADDING,
+    horizontal=19.5 * PADDING, vertical=6.3 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="Dijkstra", textcolor=colors["black"],
     button_color=colors["white"], screen=screen, font=ButtonFont)
 
 astar_man_button = Button(
-    horizontal=18.5 * PADDING, vertical=10 * PADDING,
+    horizontal=19.5 * PADDING, vertical=8.8 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="A* (man)", textcolor=colors["black"],
     button_color=colors["white"], screen=screen, font=ButtonFont)
 
 astar_evk_button = Button(
-    horizontal=18.5 * PADDING, vertical=13 * PADDING,
+    horizontal=19.5 * PADDING, vertical=11.3 * PADDING,
     width=3 * PADDING, height=1.5 * PADDING,
     text="A* (evk)", textcolor=colors["black"],
     button_color=colors["white"], screen=screen, font=ButtonFont)

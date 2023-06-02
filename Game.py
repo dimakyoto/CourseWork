@@ -3,7 +3,6 @@ from Algorithms import *
 from Maze import *
 
 class Game:
-
     def __init__(self):
         self.__RUNNING = True
         self.__SEARCH = False
@@ -18,6 +17,11 @@ class Game:
 
         self.__board = Board(self.__v_cells, self.__h_cells, board_start[0], board_start[1], self.__cell_size, screen)
 
+    def display_error(self,message):
+        Error_field.set_text(message)
+        Error_field.draw(screen)
+        time.sleep(0.02)
+
     def enter_maze_size(self):
         color_active = pygame.Color("blue")
         color_inactive = pygame.Color("deepskyblue")
@@ -29,7 +33,7 @@ class Game:
         Instruction_text = Instruction_font.render("Enter size of the maze (e.g., 30): ", True, colors["black"])
         Instruction_text_rect = Instruction_text.get_rect(center=(WIDTH // 2, 275))
 
-        Warning_text = ButtonFont.render("Warning: The input number must be between 10 and 50!", True,
+        Warning_text = ButtonFont.render("Warning: The input must be INTEGER NUMBER between 10 and 50!", True,
                                          colors["crimson"])
         Warning_text_rect = Warning_text.get_rect(bottomleft=(10, HEIGHT - 10))
 
@@ -54,11 +58,11 @@ class Game:
                     if ACTIVE:
                         if event.key == pygame.K_RETURN:
                             if not text.isdigit():
-                                print("Please enter a valid size (numeric value, e.g., 30)")
+                                continue
                             else:
                                 size = int(text)
                                 if size < 10 or size > 50:
-                                    print("Size must be between 10 and 50")
+                                    continue
                                 else:
                                     return size
                         elif event.key == pygame.K_BACKSPACE:
@@ -105,6 +109,8 @@ class Game:
             self.reset_algorithms_colors()
             time.sleep(self.__TIME)
 
+        Error_field.set_text("")
+
     def complexity_res(self, algorithm_info):
         labels = {
             "comparisons": Comparisons,
@@ -120,9 +126,11 @@ class Game:
                 label.set_text("")
                 label.set_text(label_info)
                 label.draw(screen)
+
     def algorithm_res_output(self, algorithm):
         if algorithm.find:
             algorithm.output()
+            self.display_error("Path found!")
 
             result_file.write("\nPath Found!\n")
             result_file.write("Algorithm used: " + str(self.__ALGO) + "\n")
@@ -136,7 +144,7 @@ class Game:
             self.complexity_res(algorithm_info)
 
         else:
-            print("Hmm, there is no solution..")
+            self.display_error("Hmm, there is no solution..")
 
             result_file.write("\nPath not Found!\n")
             result_file.write("Algorithm used: " + str(self.__ALGO) + "\n")
@@ -144,14 +152,13 @@ class Game:
             algorithm_info = algorithm.get_info()
             self.complexity_res(algorithm_info)
 
-
     def reset_algorithms_colors(self):
         astar_man_button.color_change(colors["white"])
         dijkstra_button.color_change(colors["white"])
         astar_evk_button.color_change(colors["white"])
 
     def reset_textfield(self):
-        text_fields = [Comparisons, Iterations, Visited_cells, Execution_time]
+        text_fields = [Comparisons, Iterations, Visited_cells, Execution_time, Error_field]
         for field in text_fields:
             field.set_text("")
             field.draw(screen)
@@ -180,6 +187,7 @@ class Game:
                 Iterations.draw(screen)
                 Visited_cells.draw(screen)
                 Execution_time.draw(screen)
+                Error_field.draw(screen)
                 dijkstra_button()
                 astar_man_button()
                 astar_evk_button()
@@ -216,24 +224,20 @@ class Game:
                     # MAZE-Button
                     elif maze_button.rect.collidepoint(mouse):
                         if self.__board.wall:
-                            print("Please press RESET(button) to reset the Board")
-                            time.sleep(self.__TIME)
+                            self.display_error("Error: Please press RESET(button)!")
                             continue
 
                         if not self.__board.start:
-                            print("Please select START(target) to generate MAZE")
-                            time.sleep(self.__TIME)
+                            self.display_error("Error: Please select START(target)!")
                             continue
 
                         elif self.__board.target:
-                            print(
-                                "Please do not set FINISH(target), you need "
-                                "just to select start target and than you can generate maze")
-                            time.sleep(self.__TIME)
+                            self.display_error("Please do not set FINISH(target)!")
                             continue
 
                         maze_button.color_change(colors["yellow"])
                         maze_button()
+                        self.display_error("")
 
                         maze_creator = Maze(self.__board)
                         maze_creator.initialize()
@@ -247,12 +251,12 @@ class Game:
                     # SIZE-Button
                     elif maze_size_button.rect.collidepoint(mouse):
                         if self.__board.wall:
-                            print("Please press RESET(button) to reset the Board")
-                            time.sleep(self.__TIME)
+                            self.display_error("Error: Please press RESET(button)!")
                             continue
 
                         maze_button.color_change(colors["white"])
                         maze_size_button.color_change(colors["yellow"])
+                        self.display_error("")
 
                         new_size = self.enter_maze_size()
 
@@ -322,12 +326,12 @@ class Game:
             # Start Search
             else:
                 if self.__board.start is None or self.__board.target is None:
-                    print("Please choose position of START(target) and FINISH(target) to search")
+                    self.display_error("Choose position of START and FINISH!")
                     self.__SEARCH = False
                     start_button.color_change(colors["green"])
                     continue
                 elif self.__ALGO is None:
-                    print("Please choose algorithm")
+                    self.display_error("Error: Please choose algorithm!")
                     self.__SEARCH = False
                     start_button.color_change(colors["green"])
                     continue
@@ -351,9 +355,10 @@ class Game:
                     algorithm.make_info()
                     algorithm.finding_path()
 
+
                 self.algorithm_res_output(algorithm)
 
                 self.__SEARCH = False
                 start_button.color_change(colors["green"])
         result_file.close()
-    CLOCK.tick(FPS)
+        CLOCK.tick(FPS)
